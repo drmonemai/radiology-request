@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b7fb8"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="طلب أشعة">
+<link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icons/icon-192.png"><link rel="apple-touch-icon" href="icons/icon-192.png">
+<title>طلب فحص أشعة – مستشفيات صحة العقاد</title>
+<style>
+:root{--bg:#eef5f8;--card:#fff;--ink:#14282f;--mut:#5a717a;--pri:#0b7fb8;--teal:#2bb3a6;--sec:#e3f1f7;--line:#d2e1e8;--red:#c9372c;--acc:#25d366}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Tahoma,"Noto Sans Arabic",Arial,sans-serif;line-height:1.6;padding-bottom:92px}
+header{background:#fff;padding:10px 16px 8px;padding-top:calc(10px + env(safe-area-inset-top,0px));text-align:center;border-bottom:4px solid;border-image:linear-gradient(90deg,var(--pri),var(--teal)) 1}
+header img{height:74px;width:auto;display:block;margin:0 auto}
+header small{color:var(--mut);font-weight:600;font-size:13px}
+.bar{background:linear-gradient(90deg,var(--pri),var(--teal));color:#fff;text-align:center;font-weight:800;padding:9px;font-size:16px}
+.time{display:flex;justify-content:center;gap:8px;align-items:center;font-size:14px;color:var(--ink);background:#fff;border-bottom:1px solid var(--line);padding:7px}
+.time b{color:var(--pri)}
+main{max-width:720px;margin:0 auto;padding:12px}
+fieldset{border:1px solid var(--line);border-radius:14px;background:var(--card);margin:0 0 12px;padding:0;overflow:hidden}
+.sh{background:var(--sec);color:#075a82;font-weight:800;font-size:14px;padding:9px 14px;border-bottom:1px solid var(--line)}
+.bd{padding:12px 14px;display:grid;gap:12px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+label.f{display:block;font-size:13px;font-weight:700;color:var(--mut)}
+label.f b,.sub b{color:var(--red)}
+input[type=text],input[type=tel],input[type=number],select,textarea{width:100%;font:inherit;font-size:16px;color:var(--ink);background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:9px 10px;margin-top:3px}
+textarea{min-height:76px;resize:vertical}
+input:focus,textarea:focus,select:focus{outline:3px solid #86c5e3;outline-offset:1px;border-color:#86c5e3}
+.invalid{border-color:var(--red)!important;background:#fff4f3}
+.sub{font-size:13px;font-weight:800;color:var(--mut);margin-bottom:6px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips label{cursor:pointer;position:relative}
+.chips input{position:absolute;opacity:0;pointer-events:none}
+.chips span{display:inline-block;padding:8px 13px;border:1.5px solid var(--line);border-radius:999px;background:#fff;font-size:14.5px;user-select:none}
+.chips span small{opacity:.7;font-size:11px}
+.chips input:checked+span{background:var(--pri);color:#fff;border-color:var(--pri)}
+.chips input:focus-visible+span{outline:3px solid #86c5e3;outline-offset:2px}
+.chips.sq span{border-radius:10px}
+.chips.urg input[value="عاجل"]:checked+span{background:var(--red);border-color:var(--red)}
+.chips.urg input[value="غير عاجل"]:checked+span{background:#2f7d5b;border-color:#2f7d5b}
+.hide{display:none!important}.bd2{display:grid;gap:10px}
+.exb{border:1px dashed var(--line);border-radius:12px;padding:10px;background:#fafdfe}
+.exb input.exo{margin-top:8px}
+.sider{display:grid;gap:6px;margin-top:10px;padding:6px;border-radius:10px}.sider.invalid{border:1.5px solid var(--red);background:#fff4f3}.sider>b{font-size:13px;color:var(--mut)}
+.pv{width:100%;display:block;border:1px solid var(--line);border-radius:12px;margin-bottom:12px}
+.qp{font:inherit;font-size:14px;border:1.5px solid var(--line);background:#fff;color:var(--ink);border-radius:999px;padding:7px 13px;cursor:pointer}.qp:active{background:var(--sec)}
+.note{font-size:12.5px;color:var(--mut)}
+.warn{background:#fff6e0;border:1px solid #f0d58a;color:#6b4e00;border-radius:10px;padding:8px 10px;font-size:13px}
+.urgbox{background:#fdeceb;border:1px solid #f3b9b4;border-radius:12px;padding:10px;display:grid;gap:8px}
+.doc{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.doc b{font-size:16px}.doc small{color:var(--mut);display:block}
+.actions{position:fixed;inset:auto 0 0 0;background:#fffffff2;backdrop-filter:blur(6px);border-top:1px solid var(--line);padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px));display:flex;gap:8px;z-index:5}
+.actions>*{flex:1}
+.b{font:inherit;font-weight:800;border:0;border-radius:12px;padding:13px 10px;cursor:pointer;text-align:center;text-decoration:none;display:block}
+.b.send{background:var(--acc);color:#04361a;flex:2}
+.b.pri{background:var(--pri);color:#fff}
+.b.sec2{background:#fff;color:var(--ink);border:1.5px solid var(--line)}
+.b.dng{background:#fde8e6;color:var(--red)}
+#m{position:fixed;inset:0;background:#000a;display:none;align-items:flex-end;justify-content:center;z-index:9}
+#m.on{display:flex}
+.sheet{background:#fff;width:100%;max-width:720px;max-height:94%;overflow:auto;border-radius:20px 20px 0 0;padding:16px 16px calc(18px + env(safe-area-inset-bottom,0px))}
+.sheet h2{margin:0 0 8px;font-size:18px;color:#075a82}
+pre{white-space:pre-wrap;word-break:break-word;font:14.5px/1.7 system-ui,Tahoma,Arial,sans-serif;background:#f3f9fb;border:1px solid var(--line);border-radius:12px;padding:12px;margin:0 0 12px;text-align:start}
+.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1;min-width:130px}
+#t{position:fixed;bottom:96px;left:0;right:0;margin:auto;width:max-content;max-width:90%;background:#14282f;color:#fff;padding:10px 14px;border-radius:12px;display:none;z-index:20;text-align:center}
+</style></head><body>
+<header><img src="icons/logo.png" alt="مستشفيات صحة العقاد"><small id="dept"></small></header>
+<div class="bar">طلب فحص أشعة</div>
+<div class="time">🕒 وقت الطلب: <b id="now"></b></div>
+<main><form id="f" autocomplete="off" novalidate>
+
+<fieldset><div class="sh">👩‍⚕️ الطبيب الطالب</div><div class="bd">
+ <div class="doc"><div><b id="dn"></b><small id="ds"></small></div><button class="b sec2" type="button" id="de" style="flex:none;padding:8px 14px">تعديل</button></div>
+</div></fieldset>
+
+<fieldset><div class="sh">👤 بيانات المريض</div><div class="bd">
+ <label class="f">اسم المريض <b>*</b><input type="text" name="pname" autocomplete="off" placeholder="الاسم ثلاثي على الأقل"></label>
+ <label class="f">رقم الملف<input type="text" name="mrn" inputmode="text"></label>
+ <div><div class="sub">مكان المريض <b>*</b></div>
+  <div class="chips" style="margin-bottom:6px"><button type="button" class="qp" data-w="طوارئ">طوارئ</button><button type="button" class="qp" data-w="رعاية مركزة">رعاية مركزة</button><button type="button" class="qp" data-w="عيادات خارجية">عيادات خارجية</button><button type="button" class="qp" data-w="غرفة ">غرفة رقم…</button></div>
+  <input type="text" name="ward" placeholder="طوارئ / رعاية / رقم الغرفة (مثال: غرفة 305)" style="margin-top:0"></div>
+ <div class="g2">
+  <div><div class="sub">السن <b>*</b></div><div style="display:flex;gap:6px"><input type="number" name="age" inputmode="numeric" min="0" max="120" style="margin-top:0"><select name="aunit" style="margin-top:0;width:90px"><option>سنة</option><option>شهر</option><option>يوم</option></select></div></div>
+  <div><div class="sub">النوع <b>*</b></div><div class="chips"><label><input type="radio" name="sex" value="ذكر"><span>ذكر</span></label><label><input type="radio" name="sex" value="أنثى"><span>أنثى</span></label></div></div>
+ </div>
+</div></fieldset>
+
+<fieldset><div class="sh">🔬 الفحص المطلوب</div><div class="bd">
+ <div><div class="sub">درجة الاستعجال <b>*</b></div>
+  <div class="chips urg"><label><input type="radio" name="urg" value="غير عاجل" checked><span>⏳ غير عاجل</span></label><label><input type="radio" name="urg" value="عاجل"><span>🚨 عاجل</span></label></div>
+  <div class="note" id="urgnote" style="margin-top:6px"></div>
+ </div>
+ <div class="urgbox hide" id="urgbox">
+  <div class="sub" style="margin:0">سبب الاستعجال <b>*</b></div>
+  <div class="chips sq" id="urc"></div>
+  <input type="text" name="urgother" placeholder="سبب آخر / تفاصيل">
+ </div>
+
+ <div><div class="sub">نوع الفحص (الجهاز) <b>*</b></div><div class="chips" id="modc"></div></div>
+ <div id="exams" style="display:grid;gap:10px"></div>
+</div></fieldset>
+
+<fieldset><div class="sh">📝 التاريخ المرضي</div><div class="bd">
+ <div><div class="sub">اختار سؤال أو أكتر، أو اكتب سؤال آخر <b>*</b></div><div class="chips sq" id="qc"></div></div>
+ <label class="f">سؤال آخر<input type="text" name="qother"></label>
+ <div><div class="sub">عمليات سابقة <b>*</b></div><div class="chips" id="surgc"><label><input type="radio" name="surg" value="يوجد"><span>يوجد</span></label><label><input type="radio" name="surg" value="لا يوجد"><span>لا يوجد</span></label></div></div>
+ <div class="bd2 hide" id="surgbox"><label class="f">حدد العمليات السابقة <b>*</b><input type="text" name="surgd" placeholder="النوع / التاريخ"></label></div>
+</div></fieldset>
+
+<fieldset><div class="sh">⚠️ التحاليل والسلامة والأشعة السابقة</div><div class="bd">
+ <div><div class="sub">تحاليل سابقة <b>*</b></div><div class="chips" id="labc"><label><input type="radio" name="labs" value="يوجد"><span>يوجد</span></label><label><input type="radio" name="labs" value="لا يوجد"><span>لا يوجد</span></label></div></div>
+ <div class="bd2 hide" id="labbox">
+  <div class="g2">
+   <label class="f">الكرياتينين<input type="text" name="cr" inputmode="decimal" placeholder="mg/dL"></label>
+   <label class="f">TLC<input type="text" name="tlc" inputmode="decimal"></label>
+  </div>
+  <label class="f">تحاليل أخرى<input type="text" name="labo"></label>
+ </div>
+ <div id="conbox" class="hide"><div class="sub">الصبغة (للمقطعية)</div><div class="chips">
+  <label><input type="radio" name="con" value="بصبغة"><span>بصبغة</span></label>
+  <label><input type="radio" name="con" value="بدون صبغة"><span>بدون صبغة</span></label>
+  <label><input type="radio" name="con" value="حسب بروتوكول الأشعة"><span>حسب بروتوكول الأشعة</span></label></div></div>
+ <div class="warn hide" id="crw">⚠️ الأشعة بصبغة من غير قيمة كرياتينين. يُفضّل إضافتها.</div>
+ <div class="hide" id="preg"><div class="sub">الحمل <b>*</b></div><div class="chips">
+  <label><input type="radio" name="preg" value="غير حامل"><span>غير حامل</span></label>
+  <label><input type="radio" name="preg" value="حامل"><span>حامل</span></label>
+  <label><input type="radio" name="preg" value="غير معروف / مشتبه"><span>غير معروف / مشتبه</span></label></div></div>
+ <div><div class="sub">أشعة سابقة <b>*</b></div><div class="chips" id="imgc"><label><input type="radio" name="pimg" value="يوجد"><span>يوجد</span></label><label><input type="radio" name="pimg" value="لا يوجد"><span>لا يوجد</span></label></div></div>
+ <div class="bd2 hide" id="imgbox"><label class="f">تفاصيل الأشعة السابقة (النوع / التاريخ / النتيجة)<textarea name="prev"></textarea></label></div>
+</div></fieldset>
+
+</form></main>
+
+<div class="actions"><button class="b dng" type="button" id="clr">طلب جديد</button><button class="b pri" type="button" id="go" style="flex:2">📤 مراجعة وإرسال</button></div>
+<div id="m"></div><div id="t" role="status"></div>
+
+<script src="lists.js"></script>
+<script>
+const $=s=>document.querySelector(s),F=document.forms.f;
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const pad=n=>String(n).padStart(2,'0');
+const MOD={};APP.modalities.forEach(m=>MOD[m.id]=m);
+let store;try{store=JSON.parse(localStorage.getItem('rr2')||'{}')}catch(e){store={}}
+const persist=()=>{try{localStorage.setItem('rr2',JSON.stringify(store))}catch(e){}};
+const v=n=>(F.elements[n].value||'').trim();
+const checked=n=>[...F.querySelectorAll('input[name='+n+']:checked')].map(x=>x.value);
+function toast(m){const t=$('#t');t.textContent=m;t.style.display='block';clearTimeout(toast.i);toast.i=setTimeout(()=>t.style.display='none',3000)}
+
+/* ---------- الوقت ---------- */
+function fmtDT(d){const h=d.getHours(),h12=h%12||12;return pad(d.getDate())+'/'+pad(d.getMonth()+1)+'/'+d.getFullYear()+'  '+h12+':'+pad(d.getMinutes())+' '+(h<12?'ص':'م')}
+function tick(){$('#now').textContent=fmtDT(new Date())}
+setInterval(tick,20000);tick();
+const reqId=d=>'RR-'+String(d.getFullYear()).slice(2)+pad(d.getMonth()+1)+pad(d.getDate())+'-'+pad(d.getHours())+pad(d.getMinutes());
+
+/* ---------- بناء القوايم ---------- */
+const chip=(type,name,val,label,extra)=>`<label><input type="${type}" ${name?'name="'+name+'"':''} value="${esc(val)}" ${extra||''}><span>${label}</span></label>`;
+$('#dept').textContent=APP.dept;
+$('#urc').innerHTML=APP.urgentReasons.map(c=>chip('checkbox','ur',c,esc(c))).join('');
+$('#modc').innerHTML=APP.modalities.map(m=>chip('checkbox','mod',m.id,esc(m.ar)+' <small>'+esc(m.en)+'</small>')).join('');
+$('#qc').innerHTML=APP.questions.map(c=>chip('checkbox','q',c,esc(c))).join('');
+
+/* ---------- الفحوصات حسب الجهاز ---------- */
+let EX={},EXO={},SIDE={},VW={},VWO={};
+const exn=x=>typeof x==='string'?x:x.n,exs=x=>typeof x==='object'&&x.side;
+const SIDES=['يمين','يسار','الاتنين'];
+function renderExams(){
+ $('#exams').innerHTML=checked('mod').map(id=>{const m=MOD[id];EX[id]=EX[id]||new Set();
+  const sideRows=m.exams.filter(x=>exs(x)&&EX[id].has(exn(x))).map(x=>{const k=id+'|'+exn(x);
+   return `<div class="sider" data-k="${esc(k)}"><b>${esc(exn(x))}: الجهة <span style="color:var(--red)">*</span></b><div class="chips">${SIDES.map(s=>`<label><input type="radio" name="sd_${esc(k)}" data-sk="${esc(k)}" value="${s}" ${SIDE[k]===s?'checked':''}><span>${s}</span></label>`).join('')}</div></div>`}).join('');
+  const views=m.views?`<div class="sider" data-v="${id}"><b>الأوضاع <span style="color:var(--red)">*</span></b><div class="chips">${m.views.map(s=>`<label><input type="radio" name="vw_${id}" data-vk="${id}" value="${esc(s)}" ${VW[id]===s?'checked':''}><span>${esc(s)}</span></label>`).join('')}</div><input type="text" class="vwo" data-m="${id}" placeholder="أوضاع أخرى (اكتب)" value="${esc(VWO[id]||'')}"></div>`:'';
+  return `<div class="exb"><div class="sub">${esc(m.ar)} — اختار الفحص</div><div class="chips sq">${m.exams.map(x=>`<label><input type="checkbox" data-m="${id}" value="${esc(exn(x))}" ${EX[id].has(exn(x))?'checked':''}><span>${esc(exn(x))}</span></label>`).join('')}</div>${sideRows}${views}<input type="text" class="exo" data-m="${id}" placeholder="فحص آخر / تفاصيل إضافية" value="${esc(EXO[id]||'')}"></div>`}).join('')}
+$('#exams').addEventListener('change',e=>{const t=e.target;
+ if(t.dataset.sk){SIDE[t.dataset.sk]=t.value;t.closest('.sider').classList.remove('invalid');return}
+ if(t.dataset.vk){VW[t.dataset.vk]=t.value;t.closest('.sider').classList.remove('invalid');return}
+ if(t.dataset.m&&t.type==='checkbox'){const s=EX[t.dataset.m];if(t.checked)s.add(t.value);else{s.delete(t.value);delete SIDE[t.dataset.m+'|'+t.value]}renderExams();$('#exams').classList.remove('invalid')}});
+$('#exams').addEventListener('input',e=>{const t=e.target;if(t.classList.contains('exo'))EXO[t.dataset.m]=t.value;if(t.classList.contains('vwo')){VWO[t.dataset.m]=t.value;const bx=t.closest('.sider');bx&&bx.classList.remove('invalid')}t.classList.remove('invalid')});
+
+/* ---------- الاستعجال ---------- */
+let urgTouched=false;
+const isEm=()=>APP.emergencyIsUrgent&&(v('ward')==='طوارئ'||store.spec==='طوارئ');
+function setUrg(val){F.querySelector('input[name=urg][value="'+val+'"]').checked=true;urgUI()}
+function autoUrg(){if(urgTouched)return;setUrg(isEm()?'عاجل':'غير عاجل')}
+function urgUI(){const u=checked('urg')[0]==='عاجل';$('#urgbox').classList.toggle('hide',!u);
+ $('#urgnote').textContent=(u&&!urgTouched&&isEm())?'اتحدد عاجل تلقائياً لأن الحالة / الطبيب طوارئ. تقدر تغيّره.':''}
+
+/* ---------- الصبغة والحمل ---------- */
+function sexUI(){const f=checked('sex')[0]==='أنثى';$('#preg').classList.toggle('hide',!f);if(!f)F.querySelectorAll('input[name=preg]').forEach(x=>x.checked=false)}
+function labUI(){const y=checked('labs')[0]==='يوجد';$('#labbox').classList.toggle('hide',!y);if(!y){['cr','tlc','labo'].forEach(n=>F.elements[n].value='')}crUI()}
+function imgUI(){const y=checked('pimg')[0]==='يوجد';$('#imgbox').classList.toggle('hide',!y);if(!y)F.elements.prev.value=''}
+function conUI(){const ct=checked('mod').includes('CT');$('#conbox').classList.toggle('hide',!ct);if(!ct)F.querySelectorAll('input[name=con]').forEach(x=>x.checked=false);crUI()}
+function surgUI(){const y=checked('surg')[0]==='يوجد';$('#surgbox').classList.toggle('hide',!y);if(!y)F.elements.surgd.value=''}
+function crUI(){$('#crw').classList.toggle('hide',!(checked('mod').includes('CT')&&checked('con')[0]==='بصبغة'&&!v('cr')))}
+
+document.addEventListener('click',e=>{const q=e.target.closest&&e.target.closest('.qp');if(q){F.elements.ward.value=q.dataset.w;F.elements.ward.classList.remove('invalid');F.elements.ward.focus();autoUrg()}});
+F.addEventListener('change',e=>{const n=e.target.name;
+ if(n==='q'){$('#qc').classList.remove('invalid')}if(n==='surg'){surgUI();$('#surgc').classList.remove('invalid')}
+ if(n==='sex')sexUI();if(n==='con')crUI();if(n==='labs'){labUI();$('#labc').classList.remove('invalid')}if(n==='pimg'){imgUI();$('#imgc').classList.remove('invalid')}
+ if(n==='urg'){urgTouched=true;urgUI()}
+ if(n==='mod'){renderExams();conUI();$('#modc').classList.remove('invalid')}});
+F.addEventListener('input',e=>{e.target.classList.remove('invalid');if(e.target.name==='cr')crUI()});
+
+/* ---------- بيانات الطبيب (بتتسجل مرة واحدة) ---------- */
+function renderDoc(){$('#dn').textContent='د. '+store.doc;$('#ds').textContent='تخصص: '+store.spec+(store.tel?' · '+store.tel:'')}
+function modal(h){const m=$('#m');m.innerHTML='<div class="sheet" role="dialog">'+h+'</div>';m.classList.add('on')}
+function closeM(){$('#m').classList.remove('on')}
+$('#m').addEventListener('click',e=>{if(e.target.id==='m'&&!$('#m').dataset.lock)closeM()});
+function docSetup(first){
+ const sp=APP.specialties,cur=store.spec&&sp.includes(store.spec)?store.spec:(store.spec?'أخرى':'');
+ modal(`<h2>${first?'سجّل بياناتك مرة واحدة':'تعديل بيانات الطبيب'}</h2>
+ <p class="note" style="margin-top:0">هتتحفظ على موبايلك ومش هتحتاج تكتبها تاني في كل طلب.</p>
+ <div style="display:grid;gap:10px">
+ <label class="f">الاسم <b>*</b><input type="text" id="sn" value="${esc(store.doc||'')}"></label>
+ <label class="f">التخصص <b>*</b><select id="ss"><option value="">اختار التخصص</option>${sp.map(s=>`<option ${s===cur?'selected':''}>${esc(s)}</option>`).join('')}</select></label>
+ <label class="f ${cur==='أخرى'?'':'hide'}" id="sol">اكتب التخصص<input type="text" id="so" value="${cur==='أخرى'?esc(store.spec):''}"></label>
+ <label class="f">تليفون / داخلي (اختياري)<input type="tel" id="st" value="${esc(store.tel||'')}"></label>
+ <div class="row"><button class="b pri" id="sv" type="button">حفظ</button>${first?'':'<button class="b sec2" id="cx" type="button">إلغاء</button>'}</div></div>`);
+ $('#m').dataset.lock=first?'1':'';
+ $('#ss').onchange=()=>$('#sol').classList.toggle('hide',$('#ss').value!=='أخرى');
+ if(!first)$('#cx').onclick=closeM;
+ $('#sv').onclick=()=>{const n=$('#sn').value.trim();let s=$('#ss').value;if(s==='أخرى')s=$('#so').value.trim();
+  if(!n||!s)return toast('اكتب الاسم واختار التخصص');
+  store.doc=n;store.spec=s;store.tel=$('#st').value.trim();persist();$('#m').dataset.lock='';closeM();renderDoc();urgTouched=false;autoUrg();toast('اتحفظت بياناتك ✔')}}
+$('#de').onclick=()=>docSetup(false);
+
+/* ---------- التحقق وبناء الرسالة ---------- */
+function validate(){
+ const miss=[],bad=(el,l)=>{miss.push(l);if(el)el.classList.add('invalid')};
+ if(v('pname').split(/\s+/).filter(x=>x.length>1).length<3)bad(F.elements.pname,'اسم المريض ثلاثي');
+ if(!v('ward'))bad(F.elements.ward,'مكان المريض');
+ if(!v('age'))bad(F.elements.age,'السن');
+ if(!checked('sex').length)miss.push('النوع');
+ const mods=checked('mod');
+ if(!mods.length)bad($('#modc'),'نوع الفحص');
+ else mods.forEach(id=>{const m=MOD[id],sel=EX[id]||new Set();
+  if(!sel.size&&!(EXO[id]||'').trim())bad($('#exams'),'الفحص ('+m.ar+')');
+  m.exams.filter(x=>exs(x)&&sel.has(exn(x))).forEach(x=>{const k=id+'|'+exn(x);if(!SIDE[k])bad([...document.querySelectorAll('.sider[data-k]')].find(e=>e.dataset.k===k),'الجهة ('+exn(x)+')')});
+  if(m.views&&!VW[id]&&!(VWO[id]||'').trim())bad(document.querySelector('.sider[data-v="'+id+'"]'),'الأوضاع')});
+ if(checked('urg')[0]==='عاجل'&&!checked('ur').length&&!v('urgother'))bad($('#urgbox'),'سبب الاستعجال');
+ if(checked('surg')[0]==='يوجد'&&!v('surgd'))bad(F.elements.surgd,'حدد العمليات السابقة');
+ if(!checked('surg').length)bad($('#surgc'),'عمليات سابقة (يوجد / لا يوجد)');
+ if(!checked('q').length&&!v('qother'))bad($('#qc'),'التاريخ المرضي (اختار أو اكتب سؤال آخر)');
+ if(!checked('labs').length)bad($('#labc'),'التحاليل السابقة (يوجد / لا يوجد)');
+ if(!checked('pimg').length)bad($('#imgc'),'الأشعة السابقة (يوجد / لا يوجد)');
+ if(checked('sex')[0]==='أنثى'&&!checked('preg').length)miss.push('الحمل');
+ return miss}
+/* ---------- جمع البيانات ---------- */
+function collect(dt){
+ const urgent=checked('urg')[0]==='عاجل';
+ const reason=[...checked('ur'),...(v('urgother')?[v('urgother')]:[])].join('، ');
+ const mods=checked('mod').map(id=>{const m=MOD[id],sel=EX[id]||new Set();
+  const items=m.exams.map(exn).filter(n=>sel.has(n)).map(n=>SIDE[id+'|'+n]?n+' ('+SIDE[id+'|'+n]+')':n);
+  if((EXO[id]||'').trim())items.push(EXO[id].trim());
+  const views=m.views?[VW[id],(VWO[id]||'').trim()].filter(Boolean).join(' + '):'';
+  return{id,ar:m.ar,en:m.en,items,views}});
+ const lab=[];if(v('cr'))lab.push('كرياتينين '+v('cr'));if(v('tlc'))lab.push('TLC '+v('tlc'));if(v('labo'))lab.push(v('labo'));
+ return{id:reqId(dt),time:fmtDT(dt),urgent,reason,
+  patient:[['الاسم',v('pname')],['رقم الملف',v('mrn')],['السن / النوع',v('age')+' '+v('aunit')+' / '+checked('sex')[0]],['مكان المريض',v('ward')]].filter(x=>x[1]),
+  doc:[['الاسم','د. '+store.doc],['التخصص',store.spec],['تليفون / داخلي',store.tel]].filter(x=>x[1]),
+  labs:checked('labs')[0],labd:checked('labs')[0]==='يوجد'?lab.join(' | '):'',surgHas:checked('surg')[0],surgd:checked('surg')[0]==='يوجد'?v('surgd'):'',prevHas:checked('pimg')[0],prevd:checked('pimg')[0]==='يوجد'?v('prev'):'',con:checked('mod').includes('CT')?(checked('con')[0]||''):'',preg:checked('preg')[0]||'',
+  mods,qs:[...checked('q'),...(v('qother')?[v('qother')]:[])],surg:checked('surg')[0]==='يوجد'?(v('surgd')||'يوجد'):'لا يوجد',
+  safety:[['التحاليل',checked('labs')[0]==='يوجد'?(lab.join(' | ')||'يوجد'):'لا يوجد'],['الصبغة',checked('mod').includes('CT')?checked('con')[0]:''],['الحمل',checked('preg')[0]]].filter(x=>x[1]),prev:checked('pimg')[0]==='يوجد'?(v('prev')||'يوجد'):'لا يوجد'}}
+function textOf(D){
+ const L=['🏥 *'+APP.hospital+'*','*طلب فحص أشعة*','🆔 '+D.id,'🕒 '+D.time,''];
+ L.push(D.urgent?'🚨 *عاجل*'+(D.reason?' — السبب: '+D.reason:''):'⏳ غير عاجل','','*👤 المريض*');D.patient.forEach(x=>L.push(x[0]+': '+x[1]));
+ L.push('','*🩺 الطبيب الطالب*');D.doc.forEach(x=>L.push(x[0]+': '+x[1]));
+ L.push('','*🔬 الفحص المطلوب*');D.mods.forEach(m=>{L.push('• '+m.ar+' ('+m.en+'): '+m.items.join('، '));if(m.views)L.push('   الأوضاع: '+m.views)});
+ L.push('','*📝 التاريخ المرضي*');D.qs.forEach(q=>L.push('• '+q));L.push('عمليات سابقة: '+D.surg);
+ if(D.safety.length){L.push('','*⚠️ التحاليل والسلامة*');D.safety.forEach(x=>L.push(x[0]+': '+x[1]))}
+ if(D.prev)L.push('','*🖼 أشعة سابقة*',D.prev);
+ return L.join('\n')}
+
+/* ---------- رسم الطلب كصورة بألوان المستشفى ---------- */
+let logoImg=null;
+const logoReady=new Promise(r=>{const i=new Image();i.onload=()=>{logoImg=i;r()};i.onerror=()=>r();i.src='icons/logo.png'});
+function layout(ctx,D,draw,H){
+ const W=1080,M=44,R=W-M,CW=W-2*M,PAD=28;
+ const INK='#10242b',MUT='#526973',PRI='#0b7fb8',TEAL='#2bb3a6',LINE='#cfe0e8',SEC='#e3f1f7',DEEP='#075a82',TD='#0a8077';
+ const F=(w,s)=>w+' '+s+'px "Segoe UI",Tahoma,"Noto Sans Arabic",Arial,sans-serif';
+ ctx.direction='rtl';ctx.textBaseline='alphabetic';
+ const grad=(x0,x1)=>{const g=ctx.createLinearGradient(x0,0,x1,0);g.addColorStop(0,PRI);g.addColorStop(1,TEAL);return g};
+ const rr=(x,y,w,h,r)=>{ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()};
+ const wrap=(t,maxW,font)=>{ctx.font=font;const out=[];String(t).split('\n').forEach(par=>{const words=par.split(/\s+/).filter(Boolean);let line='';words.forEach(w=>{const test=line?line+' '+w:w;if(ctx.measureText(test).width>maxW&&line){out.push(line);line=w}else line=test});out.push(line)});return out};
+ let y=0;
+ if(draw){ctx.fillStyle='#eef5f8';ctx.fillRect(0,0,W,H);ctx.fillStyle='#fff';ctx.fillRect(0,0,W,142)}
+ if(draw&&logoImg){const lh=84,lw=lh*logoImg.width/logoImg.height;ctx.drawImage(logoImg,(W-lw)/2,8,lw,lh)}
+ if(draw){ctx.textAlign='center';ctx.fillStyle=DEEP;ctx.font=F(700,26);ctx.fillText(APP.dept,W/2,126)}
+ y=142;
+ if(draw){ctx.fillStyle=grad(0,W);ctx.fillRect(0,y,W,66);ctx.fillStyle='#fff';ctx.font=F(800,40);ctx.textAlign='right';ctx.fillText('طلب فحص أشعة',R,y+45);
+  ctx.font=F(700,28);ctx.textAlign='left';ctx.fillText(D.time,M,y+44)}
+ y+=66+14;
+ if(D.urgent){const lines=D.reason?wrap('السبب: '+D.reason,CW-2*PAD,F(700,34)):[];const h=12+56+(lines.length?lines.length*44+4:0)+12;
+  if(draw){ctx.fillStyle='#c9372c';rr(M,y,CW,h,22);ctx.fill();ctx.fillStyle='#fff';ctx.textAlign='center';ctx.font=F(800,50);ctx.fillText('عاجل',W/2,y+62);
+   ctx.font=F(700,34);ctx.textAlign='right';lines.forEach((l,i)=>ctx.fillText(l,R-PAD,y+104+i*44))}
+  y+=h+14}
+ else{const h=60;if(draw){ctx.fillStyle=SEC;rr(M,y,CW,h,22);ctx.fill();ctx.fillStyle=DEEP;ctx.textAlign='center';ctx.font=F(800,34);ctx.fillText('غير عاجل',W/2,y+42)}y+=h+14}
+ function items(list,top,doDraw){let yy=top;
+  list.forEach(it=>{
+   if(it.t==='bigkv'){const lines=wrap(it.v,CW-2*PAD,F(800,it.s)),L1=Math.round(it.s*1.2),LH=Math.round(it.s*1.3);
+    if(doDraw){ctx.textAlign='right';ctx.fillStyle=MUT;ctx.font=F(700,27);ctx.fillText(it.k,R-PAD,yy+28);ctx.fillStyle=it.c||INK;ctx.font=F(800,it.s);lines.forEach((l,i)=>ctx.fillText(l,R-PAD,yy+28+L1+i*LH))}
+    yy+=28+L1+(lines.length-1)*LH+16}
+   else if(it.t==='line'){if(doDraw){ctx.fillStyle=LINE;ctx.fillRect(M+PAD,yy+4,CW-2*PAD,2)}yy+=18}
+   else if(it.t==='cap'){if(doDraw){ctx.textAlign='right';ctx.fillStyle=MUT;ctx.font=F(700,27);ctx.fillText(it.v,R-PAD,yy+28)}yy+=42}
+   else if(it.t==='bsub'){if(doDraw){ctx.font=F(800,36);const w=ctx.measureText(it.v).width+44;ctx.fillStyle=grad(R-PAD-w,R-PAD);rr(R-PAD-w,yy+2,w,60,30);ctx.fill();ctx.fillStyle='#fff';ctx.textAlign='center';ctx.fillText(it.v,R-PAD-w/2,yy+44)}yy+=76}
+   else if(it.t==='bbullet'){const lines=wrap(it.v,CW-2*PAD-48,F(800,48));
+    if(doDraw){ctx.fillStyle=TEAL;ctx.beginPath();ctx.arc(R-PAD-10,yy+30,10,0,7);ctx.fill();ctx.textAlign='right';ctx.fillStyle=INK;ctx.font=F(800,48);lines.forEach((l,i)=>ctx.fillText(l,R-PAD-44,yy+42+i*58))}
+    yy+=lines.length*58+4}
+   else if(it.t==='con'){const f=F(800,42);ctx.font=f;const tw=ctx.measureText(it.v).width+48;
+    if(doDraw){ctx.fillStyle=TD;rr(R-PAD-tw,yy+4,tw,64,16);ctx.fill();ctx.fillStyle='#fff';ctx.font=f;ctx.textAlign='center';ctx.fillText(it.v,R-PAD-tw/2,yy+50)}
+    yy+=84}
+   else if(it.t==='bullet'){const lines=wrap(it.v,CW-2*PAD-44,F(800,40));
+    if(doDraw){ctx.fillStyle=TEAL;ctx.beginPath();ctx.arc(R-PAD-8,yy+22,8,0,7);ctx.fill();ctx.textAlign='right';ctx.fillStyle=INK;ctx.font=F(800,40);lines.forEach((l,i)=>ctx.fillText(l,R-PAD-34,yy+34+i*50))}
+    yy+=lines.length*50+8}
+   else if(it.t==='alert'){const f=F(800,40);ctx.font=f;const tw=ctx.measureText(it.v).width+56;
+    if(doDraw){ctx.fillStyle='#fff1c9';rr(R-PAD-tw,yy+2,tw,64,14);ctx.fill();ctx.strokeStyle='#d9a21b';ctx.lineWidth=3;ctx.stroke();ctx.fillStyle='#6b4a00';ctx.font=f;ctx.textAlign='center';ctx.fillText(it.v,R-PAD-tw/2,yy+48)}
+    yy+=80}
+   else if(it.t==='chips'){const f=F(800,36);ctx.font=f;let x=R-PAD,ry=yy,n=0;const maxL=M+PAD;
+    it.v.forEach(c=>{const w=ctx.measureText(c.v).width+44;if(x-w<maxL&&n){x=R-PAD;ry+=76}
+     if(doDraw){ctx.fillStyle=c.a?'#fff1c9':SEC;rr(x-w,ry,w,62,31);ctx.fill();if(c.a){ctx.strokeStyle='#d9a21b';ctx.lineWidth=3;ctx.stroke()}ctx.fillStyle=c.a?'#6b4a00':DEEP;ctx.font=f;ctx.textAlign='center';ctx.fillText(c.v,x-w/2,ry+44)}
+     x-=w+12;n++});
+    yy=ry+78}
+   else if(it.t==='text'){const lines=wrap(it.v,CW-2*PAD,F(700,34));
+    if(doDraw){ctx.textAlign='right';ctx.fillStyle=INK;ctx.font=F(700,34);lines.forEach((l,i)=>ctx.fillText(l,R-PAD,yy+34+i*48))}
+    yy+=lines.length*48+8}
+  });return yy-top}
+ function section(title,list,hero){if(!list.length)return;
+  const bh=items(list,0,false)+PAD-14,h=60+bh;
+  if(draw){ctx.fillStyle='#fff';rr(M,y,CW,h,20);ctx.fill();ctx.strokeStyle=hero?PRI:LINE;ctx.lineWidth=hero?5:2;ctx.stroke();
+   ctx.save();rr(M,y,CW,h,20);ctx.clip();ctx.fillStyle=hero?grad(M,R):SEC;ctx.fillRect(M,y,CW,60);ctx.restore();
+   ctx.fillStyle=hero?'#fff':DEEP;ctx.font=F(800,31);ctx.textAlign='right';ctx.fillText(title,R-PAD,y+41);items(list,y+60+14,true)}
+  y+=h+14}
+ function tiles(list){const g=14,N=list.length===3?3:2,cw=(CW-g*(N-1))/N;
+  for(let i=0;i<list.length;i+=N){const row=list.slice(i,i+N);
+   const meas=row.map(t=>({t,dl:t.d?wrap(t.d,cw-2*18,F(700,26)):[]}));
+   const h=Math.max(...meas.map(m=>16+28+44+(m.dl.length?m.dl.length*34+4:0)+14));
+   meas.forEach((m,j)=>{const x=R-cw-j*(cw+g);
+    if(draw){ctx.fillStyle='#fff';rr(x,y,cw,h,18);ctx.fill();ctx.strokeStyle=LINE;ctx.lineWidth=2;ctx.stroke();
+     ctx.textAlign='right';ctx.fillStyle=MUT;ctx.font=F(700,24);ctx.fillText(m.t.k,x+cw-18,y+38);
+     ctx.fillStyle=m.t.v==='لا يوجد'?MUT:TD;ctx.font=F(800,36);ctx.fillText(m.t.v,x+cw-18,y+82);
+     ctx.fillStyle=INK;ctx.font=F(700,26);m.dl.forEach((l,k)=>ctx.fillText(l,x+cw-18,y+118+k*34))}});
+   y+=h+12}
+  y+=2}
+ const pn=D.patient.find(x=>x[0]==='الاسم'),pp=D.patient.find(x=>x[0]==='مكان المريض'),pa=D.patient.find(x=>x[0]==='السن / النوع'),pm=D.patient.find(x=>x[0]==='رقم الملف');
+ const hero=[{t:'bigkv',k:'اسم المريض',v:pn?pn[1]:'',s:62},{t:'bigkv',k:'مكان المريض',v:pp?pp[1]:'',s:48,c:DEEP}];
+ const meta=[pa&&pa[1],pm&&('ملف '+pm[1])].filter(Boolean).join('   •   ');
+ if(meta)hero.push({t:'bigkv',k:'السن / النوع',v:meta,s:34});
+ hero.push({t:'line'},{t:'cap',v:'الفحص المطلوب'});
+ D.mods.forEach(m=>{hero.push({t:'bsub',v:m.ar+' ('+m.en+')'});m.items.forEach(n=>hero.push({t:'bbullet',v:n}));if(m.views)hero.push({t:'bigkv',k:'الأوضاع',v:m.views,s:38})});
+ if(D.con)hero.push({t:'con',v:'الصبغة: '+D.con});
+ section('المريض والفحص المطلوب',hero,true);
+ const AL=['مريض كبد','مريض كلى','اشتباه DVT'];
+ if(D.qs.length)section('سبب الطلب',[{t:'chips',v:[...D.qs.filter(q=>AL.includes(q)).map(q=>({v:q,a:1})),...D.qs.filter(q=>!AL.includes(q)).map(q=>({v:q}))]}]);
+ const tl=[{k:'تحاليل سابقة',v:D.labs,d:D.labd},{k:'أشعة سابقة',v:D.prevHas,d:D.prevd},{k:'عمليات سابقة',v:D.surgHas,d:D.surgd}];
+ if(D.preg)tl.push({k:'الحمل',v:D.preg});
+ tiles(tl);
+ const dn=D.doc.find(x=>x[0]==='الاسم'),ds=D.doc.find(x=>x[0]==='التخصص');
+ if(draw){ctx.fillStyle='#fff';rr(M,y,CW,70,18);ctx.fill();ctx.strokeStyle=LINE;ctx.lineWidth=2;ctx.stroke();ctx.textAlign='right';ctx.fillStyle=MUT;ctx.font=F(700,26);ctx.fillText('الطبيب الطالب',R-PAD,y+44);
+  ctx.textAlign='left';ctx.fillStyle=INK;ctx.font=F(800,34);ctx.fillText([dn&&dn[1],ds&&ds[1]].filter(Boolean).join(' — '),M+PAD,y+46)}
+ y+=70+14;
+ if(draw){ctx.fillStyle=grad(0,W);ctx.fillRect(0,y+6,W,8);ctx.fillStyle=MUT;ctx.font=F(600,22);ctx.textAlign='center';ctx.fillText(APP.hospital+'  •  '+D.id,W/2,y+52)}
+ y+=70;return y}
+async function makeImage(D){
+ await logoReady;
+ const c=document.createElement('canvas');c.width=1080;c.height=10;
+ const H=Math.ceil(layout(c.getContext('2d'),D,false));
+ c.height=H;layout(c.getContext('2d'),D,true,H);
+ return new Promise(res=>c.toBlob(res,'image/png'))}
+
+/* ---------- المراجعة والإرسال ---------- */
+let curBlob=null,curD=null,curURL='';
+async function review(){
+ const miss=validate();
+ if(miss.length){toast('ناقص: '+miss.join('، '));const f=document.querySelector('.invalid');if(f)f.scrollIntoView({block:'center',behavior:'smooth'});return}
+ curD=collect(new Date());
+ toast('بجهّز صورة الطلب…');
+ try{curBlob=await makeImage(curD)}catch(e){return toast('حصلت مشكلة في عمل الصورة')}
+ if(curURL)URL.revokeObjectURL(curURL);curURL=URL.createObjectURL(curBlob);
+ const gk=[...new Set(curD.mods.map(m=>APP.route[m.id]).filter(Boolean))];
+ const names=gk.map(k=>APP.groups[k].name);
+ modal(`<h2>راجع الطلب قبل الإرسال</h2><img class="pv" src="${curURL}" alt="صورة الطلب">
+ <div class="warn" style="margin-bottom:10px">بعد الضغط على «مشاركة» اختار <b>واتساب</b> ثم: <b>${names.map(esc).join(' + ')}</b>${names.length>1?'<br>الطلب فيه جهازين من جروبين: ابعته لأول جروب، وبعدين اضغط «مشاركة» تاني للجروب التاني.':''}</div>
+ <div class="row" style="flex-direction:column"><button class="b send" id="sh" type="button">📤 مشاركة على جروب الواتساب</button><button class="b sec2" id="bk" type="button">✏️ تعديل</button></div>`);
+ $('#sh').onclick=shareImg;$('#bk').onclick=closeM}
+function fileOf(){return new File([curBlob],curD.id+'.png',{type:'image/png'})}
+async function shareImg(){
+ const f=fileOf(),cap=(curD.urgent?'عاجل — ':'')+'طلب أشعة '+curD.id;
+ try{if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],text:cap});return}}catch(e){if(e&&e.name==='AbortError')return}
+ saveImg();toast('المشاركة مش متاحة هنا. اتحفظت الصورة، ابعتها من المعرض')}
+function saveImg(){const a=document.createElement('a');a.href=curURL;a.download=curD.id+'.png';document.body.appendChild(a);a.click();a.remove()}
+
+/* ---------- طلب جديد ---------- */
+function resetForm(){
+ F.reset();EX={};EXO={};SIDE={};VW={};VWO={};urgTouched=false;renderExams();sexUI();labUI();imgUI();surgUI();conUI();autoUrg();
+ document.querySelectorAll('.invalid').forEach(e=>e.classList.remove('invalid'));scrollTo({top:0,behavior:'smooth'})}
+$('#clr').onclick=()=>{if(confirm('مسح بيانات المريض وبدء طلب جديد؟'))resetForm()};
+$('#go').onclick=review;
+
+if(store.doc&&store.spec){renderDoc()}else{$('#dn').textContent='—';docSetup(true)}
+resetForm();window.scrollTo(0,0);
+if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+</script></body></html>
