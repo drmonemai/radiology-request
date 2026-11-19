@@ -437,7 +437,7 @@ async function review(){
  $('#sh').onclick=shareImg;$('#bk').onclick=closeM}
 function fileOf(){return new File([curBlob],curD.id+'.png',{type:'image/png'})}
 async function shareImg(){
- const f=fileOf(),pv=k=>(curD.patient.find(x=>x[0]===k)||[,''])[1],cap=(curD.urgent?'🚨 عاجل — ':'')+pv('الاسم')+(pv('مكان المريض')?' — '+pv('مكان المريض'):'');
+ const f=fileOf(),pv=k=>(curD.patient.find(x=>x[0]===k)||[,''])[1],ex=curD.mods.map(m=>m.ar+': '+m.items.join('، ')).join(' | '),cap=[(curD.urgent?'🚨 عاجل':''),pv('الاسم'),pv('مكان المريض'),ex].filter(Boolean).join(' — ');
  try{if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],text:cap});return}}catch(e){if(e&&e.name==='AbortError')return}
  saveImg();toast('المشاركة مش متاحة هنا. اتحفظت الصورة، ابعتها من المعرض')}
 function saveImg(){const a=document.createElement('a');a.href=curURL;a.download=curD.id+'.png';document.body.appendChild(a);a.click();a.remove()}
