@@ -74,6 +74,16 @@ pre{white-space:pre-wrap;word-break:break-word;font:14.5px/1.7 system-ui,Tahoma,
 .chips.sel{margin-top:8px;gap:6px}
 .xc{border:1.5px solid var(--pri);background:var(--sec);color:#075a82;border-radius:999px;padding:7px 14px;font:inherit;font-weight:700}
 input,select,button,textarea{font-family:inherit}
+#gate{position:fixed;inset:0;z-index:100;background:#fff;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center}
+.gated main,.gated header,.gated .bar,.gated .time,.gated #bar2{visibility:hidden}
+#gate .gb{max-width:340px}
+#gate img{border-radius:20px;margin-bottom:10px}
+#gate h2{margin:6px 0;color:#075a82;font-size:22px}
+#gate p{color:var(--mut);margin:0 0 16px}
+#gate button{font:inherit;font-weight:700;font-size:17px;background:var(--pri);color:#fff;border:0;border-radius:14px;padding:14px 22px;width:100%}
+#gate .gm{margin-top:14px;background:var(--sec);border-radius:12px;padding:12px;color:#075a82;line-height:1.8}
+#gate button.gl{background:transparent;color:#52697e;font-size:14px;font-weight:600;text-decoration:underline;width:auto;margin-top:22px;padding:8px}
+#gate .gd{background:#e4f4ec;color:#1d6b4a;font-weight:700;border-radius:12px;padding:14px}
 </style></head><body>
 <header id="hdr"><img id="hlogo" alt="" hidden><b id="hname"></b><small id="dept"></small></header>
 <div class="bar">طلب فحص أشعة</div>
@@ -441,5 +451,25 @@ $('#go').onclick=review;
 
 if(store.doc&&store.spec){renderDoc()}else{$('#dn').textContent='—';docSetup(true)}
 resetForm();window.scrollTo(0,0);
+/* ---------- التثبيت إجباري في أول مرة (على الموبايل) ---------- */
+(function(){let dp=null;
+ const KEY='rr2_inst_ok',ua=navigator.userAgent;
+ const std=matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+ const ok=()=>{try{return localStorage.getItem(KEY)==='1'}catch(e){return false}};
+ const mark=()=>{try{localStorage.setItem(KEY,'1')}catch(e){}};
+ if(std){mark();return}
+ const mobile=/android|iphone|ipad|ipod/i.test(ua);
+ if(!mobile||ok())return;
+ const ios=/iphone|ipad|ipod/i.test(ua),inapp=/FBAN|FBAV|Instagram|Line\/|; wv\)/i.test(ua);
+ const g=document.createElement('div');g.id='gate';
+ g.innerHTML=`<div class="gb"><img src="icons/icon-192.png" alt="" width="84" height="84"><h2>ثبّت التطبيق للمتابعة</h2><p>لازم التطبيق يتثبّت على موبايلك قبل أول استخدام.</p><button type="button" id="gbtn" hidden>📲 تثبيت التطبيق</button><div id="gman" class="gm"></div><div id="gdone" class="gd" hidden>تم التثبيت ✅ افتح التطبيق من الشاشة الرئيسية.</div><button type="button" id="gskip" class="gl">حالة طوارئ؟ كمّل من المتصفح</button></div>`;
+ document.body.appendChild(g);document.body.classList.add('gated');
+ const man=()=>{$('#gman').innerHTML=inapp?'<b>افتح الرابط في متصفح Chrome</b> (مش من داخل واتساب أو فيسبوك) وبعدين ثبّت التطبيق.':ios?'اضغط زرار <b>المشاركة</b> ⬆️ ثم <b>«إضافة إلى الشاشة الرئيسية»</b>.':'اضغط النقط التلاتة <b>⋮</b> في Chrome ثم <b>«تثبيت التطبيق»</b> أو <b>«إضافة إلى الشاشة الرئيسية»</b>.'};
+ man();
+ addEventListener('beforeinstallprompt',e=>{e.preventDefault();dp=e;$('#gbtn').hidden=false;$('#gman').innerHTML='أو من قايمة Chrome ⋮ ثم «تثبيت التطبيق».'});
+ $('#gbtn').onclick=async()=>{if(!dp)return;dp.prompt();try{const r=await dp.userChoice;if(r&&r.outcome==='accepted')done()}catch(e){}dp=null};
+ $('#gskip').onclick=()=>{g.remove();document.body.classList.remove('gated')};
+ function done(){mark();$('#gbtn').hidden=true;$('#gman').hidden=true;$('#gdone').hidden=false}
+ addEventListener('appinstalled',done)})();
 if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 </script></body></html>
