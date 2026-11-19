@@ -429,27 +429,29 @@ async function makeImage(D){
  return new Promise(res=>c.toBlob(res,'image/png'))}
 
 /* ---------- المراجعة والإرسال ---------- */
-let curBlob=null,curD=null,curURL='';
+let curBlobs=[],curDs=[],curURLs=[],curD=null,GR={};
+function splitReqs(D){const out=[];D.mods.forEach(m=>m.items.forEach(it=>{const ct=m.id==='CT';
+ out.push({...D,mods:[{...m,items:[it]}],con:ct?D.con:'',cr:ct?D.cr:'',safety:D.safety.filter(x=>ct||x[0]!=='الصبغة')})}));return out}
 async function review(){
  const miss=validate();
  if(!miss.length){const tb=timeBlock();if(tb){toast('⏰ '+tb,6500);return}}
  if(miss.length){toast('ناقص: '+miss.join('، '));const f=document.querySelector('.invalid');if(f)f.scrollIntoView({block:'center',behavior:'smooth'});return}
- curD=collect(new Date());
- toast('بجهّز صورة الطلب…');
- try{curBlob=await makeImage(curD)}catch(e){return toast('حصلت مشكلة في عمل الصورة')}
- if(curURL)URL.revokeObjectURL(curURL);curURL=URL.createObjectURL(curBlob);
- const gk=[...new Set(curD.mods.map(m=>APP.route[m.id]).filter(Boolean))];
- const names=gk.map(k=>APP.groups[k].name);
- modal(`<h2>راجع الطلب قبل الإرسال</h2><img class="pv" src="${curURL}" alt="صورة الطلب">
- <div class="warn" style="margin-bottom:10px">بعد الضغط على «مشاركة» اختار <b>واتساب</b> ثم: <b>${names.map(esc).join(' + ')}</b>${names.length>1?'<br>الطلب فيه جهازين من جروبين: ابعته لأول جروب، وبعدين اضغط «مشاركة» تاني للجروب التاني.':''}</div>
- <div class="row" style="flex-direction:column"><button class="b send" id="sh" type="button">📤 مشاركة على جروب الواتساب</button><button class="b sec2" id="bk" type="button">✏️ تعديل</button></div>`);
- $('#sh').onclick=shareImg;$('#bk').onclick=closeM}
-function fileOf(){return new File([curBlob],curD.id+'.png',{type:'image/png'})}
-async function shareImg(){
- const f=fileOf(),pv=k=>(curD.patient.find(x=>x[0]===k)||[,''])[1],ex=curD.mods.map(m=>m.ar+': '+m.items.join('، ')).join(' | '),cap=[(curD.urgent?'🚨 عاجل':''),pv('الاسم'),pv('مكان المريض'),ex].filter(Boolean).join(' — ');
- try{if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],text:cap});return}}catch(e){if(e&&e.name==='AbortError')return}
- saveImg();toast('المشاركة مش متاحة هنا. اتحفظت الصورة، ابعتها من المعرض')}
-function saveImg(){const a=document.createElement('a');a.href=curURL;a.download=curD.id+'.png';document.body.appendChild(a);a.click();a.remove()}
+ curD=collect(new Date());curDs=splitReqs(curD);
+ toast('بجهّز '+(curDs.length>1?curDs.length+' طلبات…':'صورة الطلب…'));
+ try{curBlobs=[];for(const d of curDs)curBlobs.push(await makeImage(d))}catch(e){return toast('حصلت مشكلة في عمل الصورة')}
+ curURLs.forEach(u=>URL.revokeObjectURL(u));curURLs=curBlobs.map(b=>URL.createObjectURL(b));
+ const n=curDs.length;GR={};curDs.forEach((d,i)=>{const k=APP.route[d.mods[0].id]||'x';(GR[k]=GR[k]||[]).push(i)});
+ const ks=Object.keys(GR),multi=ks.length>1;
+ modal(`<h2>راجع ${n>1?'الطلبات ('+n+')':'الطلب'} قبل الإرسال</h2>${curURLs.map((u,i)=>(n>1?`<div class="sub" style="margin:8px 0 4px">طلب ${i+1} من ${n}${multi?' — '+esc((APP.groups[APP.route[curDs[i].mods[0].id]]||{}).name||''):''}</div>`:'')+`<img class="pv" src="${u}" alt="صورة الطلب">`).join('')}
+ <div class="warn" style="margin-bottom:10px">${multi?'الطلبات متقسّمة على جروبين. اضغط زرار كل جروب، واختار <b>واتساب</b> ثم الجروب المكتوب على الزرار.':'بعد الضغط على «مشاركة» اختار <b>واتساب</b> ثم: <b>'+esc((APP.groups[ks[0]]||{}).name||'')+'</b>'}${n>1&&!multi?'<br>هيتبعتوا '+n+' صور مرة واحدة، كل صورة طلب لفحص.':''}</div>
+ <div class="row" style="flex-direction:column">${ks.map(k=>`<button class="b send" data-g="${k}" type="button">📤 ${multi?'ابعت لـ '+esc((APP.groups[k]||{}).name||'')+' ('+GR[k].length+')':'مشاركة على جروب الواتساب'}</button>`).join('')}<button class="b sec2" id="bk" type="button">✏️ تعديل</button></div>`);
+ document.querySelectorAll('button[data-g]').forEach(b=>b.onclick=()=>shareImg(b.dataset.g));$('#bk').onclick=closeM}
+function filesOf(idx){return idx.map(i=>new File([curBlobs[i]],curD.id+(curBlobs.length>1?'-'+(i+1):'')+'.png',{type:'image/png'}))}
+async function shareImg(k){
+ const idx=GR[k]||curBlobs.map((_,i)=>i),fs=filesOf(idx),pv=x=>(curD.patient.find(y=>y[0]===x)||[,''])[1],ex=idx.map(i=>curDs[i].mods[0]).map(m=>m.ar+': '+m.items.join('، ')).join(' | '),cap=[(curD.urgent?'🚨 عاجل':''),pv('الاسم'),pv('مكان المريض'),ex].filter(Boolean).join(' — ');
+ try{if(navigator.canShare&&navigator.canShare({files:fs})){await navigator.share({files:fs,text:cap});return}}catch(e){if(e&&e.name==='AbortError')return}
+ saveImg(idx);toast('المشاركة مش متاحة هنا. اتحفظت الصور، ابعتها من المعرض')}
+function saveImg(idx){(idx||curURLs.map((_,i)=>i)).forEach(i=>{const a=document.createElement('a');a.href=curURLs[i];a.download=curD.id+(curURLs.length>1?'-'+(i+1):'')+'.png';document.body.appendChild(a);a.click();a.remove()})}
 
 /* ---------- طلب جديد ---------- */
 function resetForm(){
