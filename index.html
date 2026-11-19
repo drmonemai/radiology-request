@@ -149,6 +149,7 @@ input,select,button,textarea{font-family:inherit}
 </div></fieldset>
 
 </form></main>
+<footer id="own" style="text-align:center;color:#52697e;font-size:13px;font-weight:600;padding:6px 0 90px"></footer>
 
 <div class="actions"><button class="b dng" type="button" id="clr">طلب جديد</button><button class="b pri" type="button" id="go" style="flex:2">📤 مراجعة وإرسال</button></div>
 <div id="m"></div><div id="t" role="status"></div>
@@ -163,7 +164,7 @@ let store;try{store=JSON.parse(localStorage.getItem('rr2')||'{}')}catch(e){store
 const persist=()=>{try{localStorage.setItem('rr2',JSON.stringify(store))}catch(e){}};
 const v=n=>(F.elements[n].value||'').trim();
 const checked=n=>[...F.querySelectorAll('input[name='+n+']:checked')].map(x=>x.value);
-function toast(m){const t=$('#t');t.textContent=m;t.style.display='block';clearTimeout(toast.i);toast.i=setTimeout(()=>t.style.display='none',3000)}
+function toast(m,ms){const t=$('#t');t.textContent=m;t.style.display='block';clearTimeout(toast.i);toast.i=setTimeout(()=>t.style.display='none',ms||3000)}
 
 /* ---------- الوقت ---------- */
 function fmtDT(d){const h=d.getHours(),h12=h%12||12;return pad(d.getDate())+'/'+pad(d.getMonth()+1)+'/'+d.getFullYear()+'  '+h12+':'+pad(d.getMinutes())+' '+(h<12?'ص':'م')}
@@ -176,6 +177,7 @@ const chip=(type,name,val,label,extra)=>`<label><input type="${type}" ${name?'na
 $('#dept').textContent=APP.dept||'';
 if(APP.logo){$('#hlogo').src=APP.logo;$('#hlogo').hidden=false}
 if(APP.hospital)$('#hname').textContent=APP.hospital;
+if(APP.owner&&$('#own'))$('#own').textContent=APP.owner;
 $('#urc').innerHTML=APP.urgentReasons.map(c=>chip('checkbox','ur',c,esc(c))).join('');
 $('#modc').innerHTML='<select class="exsel" id="modsel"></select><div class="chips sel" id="modchips"></div><span hidden style="display:none!important" id="modbx">'+APP.modalities.map(m=>chip('checkbox','mod',m.id,esc(m.ar))).join('')+'</span>';
 const modLbl=m=>m.ar+' ('+m.en+')';
@@ -271,6 +273,12 @@ function docSetup(first){
   store.doc=n;store.spec=s;store.tel=$('#st').value.trim();persist();$('#m').dataset.lock='';closeM();renderDoc();urgTouched=false;autoUrg();toast('اتحفظت بياناتك ✔')}}
 $('#de').onclick=()=>docSetup(false);
 
+
+function timeBlock(){const w=APP.window;if(!w)return '';const urgent=checked('urg')[0]==='عاجل',ward=v('ward');
+ if(urgent||/طوارئ|عيادات|خارج/.test(ward))return '';const h=new Date().getHours();
+ if(h>=w.from&&h<w.to)return '';
+ return 'الحالات الغير عاجلة (داخلي / رعاية) بتتبعت من '+fh(w.from)+' لـ '+fh(w.to)+' بس. لو الحالة عاجلة اختار «عاجل»'}
+const fh=h=>h===12?'12 ظ':h>12?(h-12)+' م':h+' ص';
 /* ---------- التحقق وبناء الرسالة ---------- */
 function validate(){
  const miss=[],bad=(el,l)=>{miss.push(l);if(el)el.classList.add('invalid')};
@@ -410,8 +418,8 @@ function layout(ctx,D,draw,H){
  if(draw){ctx.fillStyle='#fff';rr(M,y,CW,70,18);ctx.fill();ctx.strokeStyle=LINE;ctx.lineWidth=2;ctx.stroke();ctx.textAlign='right';ctx.fillStyle=MUT;ctx.font=F(700,26);ctx.fillText('الطبيب الطالب',R-PAD,y+44);
   ctx.textAlign='left';ctx.fillStyle=INK;ctx.font=F(800,34);ctx.fillText([dn&&dn[1],ds&&ds[1]].filter(Boolean).join(' — '),M+PAD,y+46)}
  y+=70+14;
- if(draw){ctx.fillStyle=grad(0,W);ctx.fillRect(0,y+6,W,8);ctx.fillStyle=MUT;ctx.font=F(600,22);ctx.textAlign='center';ctx.fillText((APP.hospital?APP.hospital+'  •  ':'')+D.id,W/2,y+52)}
- y+=70;return y}
+ if(draw){ctx.fillStyle=grad(0,W);ctx.fillRect(0,y+6,W,8);ctx.fillStyle=MUT;ctx.font=F(600,22);ctx.textAlign='center';ctx.fillText(APP.hospital||'',W/2,y+52);if(APP.owner){ctx.font=F(600,20);ctx.fillText(APP.owner,W/2,y+82)}}
+ y+=APP.owner?96:70;return y}
 async function makeImage(D){
  await logoReady;
  try{await Promise.all(['500','600','700'].map(w=>document.fonts.load(w+' 30px "IBM Plex Sans Arabic"','محمد ABC 123')))}catch(e){}
@@ -424,6 +432,7 @@ async function makeImage(D){
 let curBlob=null,curD=null,curURL='';
 async function review(){
  const miss=validate();
+ if(!miss.length){const tb=timeBlock();if(tb){toast('⏰ '+tb,6500);return}}
  if(miss.length){toast('ناقص: '+miss.join('، '));const f=document.querySelector('.invalid');if(f)f.scrollIntoView({block:'center',behavior:'smooth'});return}
  curD=collect(new Date());
  toast('بجهّز صورة الطلب…');
