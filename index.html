@@ -105,6 +105,13 @@ input,select,button,textarea{font-family:inherit}
   </div>
 </div></fieldset>
 
+<fieldset><div class="sh">📝 التاريخ المرضي</div><div class="bd">
+ <div><div class="sub">اختار سؤال أو أكتر، أو اكتب سؤال آخر <b>*</b></div><div id="qc" style="display:block"></div></div>
+ <label class="f">سؤال آخر<input type="text" name="qother"></label>
+ <div><div class="sub">عمليات سابقة <b>*</b></div><div class="chips" id="surgc"><label><input type="radio" name="surg" value="يوجد"><span>يوجد</span></label><label><input type="radio" name="surg" value="لا يوجد"><span>لا يوجد</span></label></div></div>
+ <div class="bd2 hide" id="surgbox"><label class="f">حدد العمليات السابقة <b>*</b><input type="text" name="surgd" placeholder="النوع / التاريخ"></label></div>
+</div></fieldset>
+
 <fieldset><div class="sh">🔬 الفحص المطلوب</div><div class="bd">
  <div><div class="sub">درجة الاستعجال <b>*</b></div>
   <div class="chips urg"><label><input type="radio" name="urg" value="غير عاجل" checked><span>⏳ غير عاجل</span></label><label><input type="radio" name="urg" value="عاجل"><span>🚨 عاجل</span></label></div>
@@ -117,13 +124,6 @@ input,select,button,textarea{font-family:inherit}
 
  <div><div class="sub">نوع الفحص (الجهاز) <b>*</b></div><div style="font-size:14px;color:#075a82;font-weight:600;margin:-2px 0 8px">ℹ️ يمكن اختيار أكثر من فحص للمريض</div><div class="chips" id="modc"></div></div>
  <div id="exams" style="display:grid;gap:10px"></div>
-</div></fieldset>
-
-<fieldset><div class="sh">📝 التاريخ المرضي</div><div class="bd">
- <div><div class="sub">اختار سؤال أو أكتر، أو اكتب سؤال آخر <b>*</b></div><div id="qc" style="display:block"></div></div>
- <label class="f">سؤال آخر<input type="text" name="qother"></label>
- <div><div class="sub">عمليات سابقة <b>*</b></div><div class="chips" id="surgc"><label><input type="radio" name="surg" value="يوجد"><span>يوجد</span></label><label><input type="radio" name="surg" value="لا يوجد"><span>لا يوجد</span></label></div></div>
- <div class="bd2 hide" id="surgbox"><label class="f">حدد العمليات السابقة <b>*</b><input type="text" name="surgd" placeholder="النوع / التاريخ"></label></div>
 </div></fieldset>
 
 <fieldset><div class="sh">⚠️ التحاليل والسلامة والأشعة السابقة</div><div class="bd">
