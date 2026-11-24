@@ -112,8 +112,7 @@ input,select,button,textarea{font-family:inherit}
  </div>
  <div class="urgbox hide" id="urgbox">
   <div class="sub" style="margin:0">سبب الاستعجال <b>*</b></div>
-  <div class="chips sq" id="urc"></div>
-  <input type="text" name="urgother" placeholder="سبب آخر / تفاصيل">
+  <input type="text" name="urgother" placeholder="اكتب سبب الاستعجال">
  </div>
 
  <div><div class="sub">نوع الفحص (الجهاز) <b>*</b></div><div style="font-size:14px;color:#075a82;font-weight:600;margin:-2px 0 8px">ℹ️ يمكن اختيار أكثر من فحص للمريض</div><div class="chips" id="modc"></div></div>
@@ -178,7 +177,6 @@ $('#dept').textContent=APP.dept||'';
 if(APP.logo){$('#hlogo').src=APP.logo;$('#hlogo').hidden=false}
 if(APP.hospital)$('#hname').textContent=APP.hospital;
 if(APP.owner&&$('#own'))$('#own').textContent=APP.owner;
-$('#urc').innerHTML=APP.urgentReasons.map(c=>chip('checkbox','ur',c,esc(c))).join('');
 $('#modc').innerHTML='<select class="exsel" id="modsel"></select><div class="chips sel" id="modchips"></div><span hidden style="display:none!important" id="modbx">'+APP.modalities.map(m=>chip('checkbox','mod',m.id,esc(m.ar))).join('')+'</span>';
 const modLbl=m=>m.ar+' ('+m.en+')';
 function modUI(){const on=checked('mod');
@@ -188,17 +186,29 @@ function modSet(id,val){const cb=F.querySelector('input[name=mod][value="'+id+'"
 $('#modsel').addEventListener('change',e=>{if(e.target.value)modSet(e.target.value,true)});
 $('#modchips').addEventListener('click',e=>{const b=e.target.closest('.xc');if(b)modSet(b.dataset.id,false)});
 modUI();
-const qn=x=>typeof x==='string'?x:x.n,qside=x=>typeof x==='object'&&!!x.side;
-let QS={};
-$('#qc').innerHTML='<select class="exsel" id="qsel"></select><div class="chips sel" id="qchips"></div><div id="qsides" style="display:grid;gap:8px;margin-top:8px"></div><span hidden style="display:none!important">'+APP.questions.map(c=>chip('checkbox','q',qn(c),esc(qn(c)))).join('')+'</span>';
-function qUI(){const on=checked('q');
- $('#qsel').innerHTML='<option value="">اختر الشكوى…</option>'+APP.questions.filter(c=>!on.includes(qn(c))).map(c=>`<option>${esc(qn(c))}</option>`).join('');
- $('#qchips').innerHTML=APP.questions.filter(c=>on.includes(qn(c))).map(c=>`<button type="button" class="xc" data-q="${esc(qn(c))}">${esc(qn(c))}${QS[qn(c)]?' ('+esc(QS[qn(c)])+')':''} ✕</button>`).join('');
- $('#qsides').innerHTML=APP.questions.filter(c=>qside(c)&&on.includes(qn(c))).map(c=>`<div class="sider" data-qk="${esc(qn(c))}"><b>${esc(qn(c))}: الجهة <span style="color:var(--red)">*</span></b><div class="chips">${['يمين','يسار'].map(x=>`<label><input type="radio" name="qsd" data-qs="${esc(qn(c))}" value="${x}" ${QS[qn(c)]===x?'checked':''}><span>${x}</span></label>`).join('')}</div></div>`).join('')}
-function qSet(name,val){const cb=F.querySelector('input[name=q][value="'+name+'"]');if(!cb)return;cb.checked=val;if(!val)delete QS[name];cb.dispatchEvent(new Event('change',{bubbles:true}))}
+const QL=()=>APP.questions.filter(c=>c!=='---');
+const qn=x=>typeof x==='string'?x:x.n,qside=x=>typeof x==='object'&&!!x.side,qf=x=>(typeof x==='object'&&x.f)||[];
+let QS={},QD={};
+const QSIDES=['Rt','Lt','Both'];
+$('#qc').innerHTML='<select class="exsel" id="qsel"></select><div class="chips sel" id="qchips"></div><div id="qsides" style="display:grid;gap:8px;margin-top:8px"></div><span hidden style="display:none!important">'+QL().map(c=>chip('checkbox','q',qn(c),esc(qn(c)))).join('')+'</span>';
+const qTxt=c=>{const n=qn(c),d=QD[n]||{},a=[...(QS[n]?[QS[n]]:[]),...qf(c).map(f=>d[f.k]?f.k+': '+d[f.k]:'').filter(Boolean)];return a.length?n+' ('+a.join(' | ')+')':n};
+function qUI(){const on=checked('q');let h='',last='';
+ APP.questions.forEach(c=>{if(c==='---'){if(h&&last!=='---')h+='<option disabled>──────────</option>';last='---';return}
+  if(!on.includes(qn(c))){h+='<option>'+esc(qn(c))+'</option>';last='o'}});
+ h=h.replace(/(<option disabled>──────────<\/option>)+$/,'');
+ $('#qsel').innerHTML='<option value="">اختر الشكوى…</option>'+h;
+ $('#qchips').innerHTML=QL().filter(c=>on.includes(qn(c))).map(c=>`<button type="button" class="xc" data-q="${esc(qn(c))}">${esc(qn(c))}${QS[qn(c)]?' ('+esc(QS[qn(c)])+')':''} ✕</button>`).join('');
+ $('#qsides').innerHTML=QL().filter(c=>on.includes(qn(c))&&(qside(c)||qf(c).length)).map(c=>{const n=qn(c),d=QD[n]||{};
+  const side=qside(c)?`<div class="chips">${QSIDES.map(x=>`<label><input type="radio" name="qsd_${esc(n)}" data-qs="${esc(n)}" value="${x}" ${QS[n]===x?'checked':''}><span>${x}</span></label>`).join('')}</div>`:'';
+  const fs=qf(c).map(f=>f.t==='yn'?`<div style="margin-top:6px"><span class="sub" style="margin:0">${esc(f.k)}${f.req?' <span style="color:var(--red)">*</span>':''}</span><div class="chips">${['Yes','No'].map(x=>`<label><input type="radio" name="qfy_${esc(n)}_${esc(f.k)}" data-qd="${esc(n)}" data-qk="${esc(f.k)}" value="${x}" ${d[f.k]===x?'checked':''}><span>${x}</span></label>`).join('')}</div></div>`:`<label class="f" style="margin-top:6px">${esc(f.k)}${f.req?' <span style="color:var(--red)">*</span>':' (اختياري)'}<input type="text" data-qd="${esc(n)}" data-qk="${esc(f.k)}" value="${esc(d[f.k]||'')}"></label>`).join('');
+  return `<div class="sider" data-qkey="${esc(n)}"><b>${esc(n)}${qside(c)?': Rt / Lt / Both <span style="color:var(--red)">*</span>':''}</b>${side}${fs}</div>`}).join('')}
+function qSet(name,val){const cb=F.querySelector('input[name=q][value="'+name+'"]');if(!cb)return;cb.checked=val;if(!val){delete QS[name];delete QD[name]}cb.dispatchEvent(new Event('change',{bubbles:true}))}
 $('#qsel').addEventListener('change',e=>{if(e.target.value)qSet(e.target.value,true)});
 $('#qchips').addEventListener('click',e=>{const b=e.target.closest('.xc');if(b)qSet(b.dataset.q,false)});
-$('#qsides').addEventListener('change',e=>{const t=e.target;if(t.dataset.qs){QS[t.dataset.qs]=t.value;t.closest('.sider').classList.remove('invalid');qUI()}});
+$('#qsides').addEventListener('change',e=>{const t=e.target;
+ if(t.dataset.qs){QS[t.dataset.qs]=t.value;t.closest('.sider').classList.remove('invalid');qUI()}
+ else if(t.dataset.qd&&t.type==='radio'){(QD[t.dataset.qd]=QD[t.dataset.qd]||{})[t.dataset.qk]=t.value;t.closest('.sider').classList.remove('invalid')}});
+$('#qsides').addEventListener('input',e=>{const t=e.target;if(t.dataset.qd&&t.type==='text'){(QD[t.dataset.qd]=QD[t.dataset.qd]||{})[t.dataset.qk]=t.value.trim();t.classList.remove('invalid');t.closest('.sider').classList.remove('invalid')}});
 qUI();
 
 /* ---------- الفحوصات حسب الجهاز ---------- */
@@ -292,10 +302,12 @@ function validate(){
   if(sel.has('أخرى')&&!(EXO[id]||'').trim())bad($('#exams'),'اكتب الفحص الآخر ('+m.ar+')');
   m.exams.filter(x=>exs(x)&&sel.has(exn(x))).forEach(x=>{const k=id+'|'+exn(x);if(!SIDE[k])bad([...document.querySelectorAll('.sider[data-k]')].find(e=>e.dataset.k===k),'الجهة ('+exn(x)+')')});
   if(m.views&&!VW[id]&&!(VWO[id]||'').trim())bad(document.querySelector('.sider[data-v="'+id+'"]'),'الأوضاع')});
- if(checked('urg')[0]==='عاجل'&&!checked('ur').length&&!v('urgother'))bad($('#urgbox'),'سبب الاستعجال');
+ if(checked('urg')[0]==='عاجل'&&!v('urgother'))bad($('#urgbox'),'سبب الاستعجال');
  if(checked('surg')[0]==='يوجد'&&!v('surgd'))bad(F.elements.surgd,'حدد العمليات السابقة');
  if(!checked('surg').length)bad($('#surgc'),'عمليات سابقة (يوجد / لا يوجد)');
- APP.questions.filter(c=>qside(c)&&checked('q').includes(qn(c))&&!QS[qn(c)]).forEach(c=>bad([...document.querySelectorAll('.sider[data-qk]')].find(e=>e.dataset.qk===qn(c)),'الجهة ('+qn(c)+')'));
+ QL().filter(c=>checked('q').includes(qn(c))).forEach(c=>{const n=qn(c),el=[...document.querySelectorAll('.sider[data-qkey]')].find(e=>e.dataset.qkey===n);
+  if(qside(c)&&!QS[n])bad(el,'Rt/Lt/Both ('+n+')');
+  qf(c).forEach(f=>{if(f.req&&!((QD[n]||{})[f.k]||'').trim())bad(el,f.k+' ('+n+')')})});
  if(!checked('q').length&&!v('qother'))bad($('#qc'),'التاريخ المرضي (اختار أو اكتب سؤال آخر)');
  if(needCr()&&!v('cr'))bad(F.elements.cr,'الكرياتينين (مطلوب مع الصبغة)');
  if(!checked('labs').length)bad($('#labc'),'التحاليل السابقة (يوجد / لا يوجد)');
@@ -304,7 +316,7 @@ function validate(){
 /* ---------- جمع البيانات ---------- */
 function collect(dt){
  const urgent=checked('urg')[0]==='عاجل';
- const reason=[...checked('ur'),...(v('urgother')?[v('urgother')]:[])].join('، ');
+ const reason=v('urgother');
  const mods=checked('mod').map(id=>{const m=MOD[id],sel=EX[id]||new Set();
   const exo=(EXO[id]||'').trim();let items=m.exams.map(exn).filter(n=>sel.has(n)).map(n=>SIDE[id+'|'+n]?n+' ('+SIDE[id+'|'+n]+')':n);
   if(exo){if(items.includes('أخرى'))items=items.map(n=>n==='أخرى'?exo:n);else items.push(exo)}
@@ -315,7 +327,7 @@ function collect(dt){
   patient:[['الاسم',v('pname')],['رقم الملف',v('mrn')],['السن',v('age')+' '+v('aunit')],['مكان المريض',v('ward')]].filter(x=>x[1]),
   doc:[['الاسم','د. '+store.doc],['التخصص',store.spec],['تليفون / داخلي',store.tel]].filter(x=>x[1]),
   labs:checked('labs')[0],labd:checked('labs')[0]==='يوجد'?lab.join(' | '):'',surgHas:checked('surg')[0],surgd:checked('surg')[0]==='يوجد'?v('surgd'):'',prevHas:checked('pimg')[0],prevd:checked('pimg')[0]==='يوجد'?v('prev'):'',con:checked('mod').includes('CT')?(checked('con')[0]||''):'',cr:v('cr'),preg:checked('preg')[0]||'',
-  mods,qs:[...checked('q').map(n=>QS[n]?n+' ('+QS[n]+')':n),...(v('qother')?[v('qother')]:[])],surg:checked('surg')[0]==='يوجد'?(v('surgd')||'يوجد'):'لا يوجد',
+  mods,qs:[...QL().filter(c=>checked('q').includes(qn(c))).map(qTxt),...(v('qother')?[v('qother')]:[])],surg:checked('surg')[0]==='يوجد'?(v('surgd')||'يوجد'):'لا يوجد',
   safety:[['التحاليل',checked('labs')[0]==='يوجد'?(lab.join(' | ')||'يوجد'):'لا يوجد'],['الصبغة',checked('mod').includes('CT')?checked('con')[0]:''],['الحمل',checked('preg')[0]]].filter(x=>x[1]),prev:checked('pimg')[0]==='يوجد'?(v('prev')||'يوجد'):'لا يوجد'}}
 function textOf(D){
  const L=['🏥 *'+APP.hospital+'*','*طلب فحص أشعة*','🆔 '+D.id,'🕒 '+D.time,''];
@@ -413,8 +425,9 @@ function layout(ctx,D,draw,H){
  D.mods.forEach(m=>{const g=gof(m.id);hero.push({t:'bsub',v:m.ar+' ('+m.en+')',g});m.items.forEach(n=>hero.push({t:'bbullet',v:n,g}));if(m.views)hero.push({t:'bigkv',k:'الأوضاع',v:m.views,s:38})});
  if(D.con)hero.push({t:'con',v:'الصبغة: '+D.con+(D.cr?' — كرياتينين '+D.cr:'')});
  section('المريض والفحص المطلوب',hero,true);
- const AL=['مريض كبد','مريض كلى','اشتباه DVT'];
- if(D.qs.length)section('سبب الطلب',[{t:'chips',v:[...D.qs.filter(q=>AL.includes(q)).map(q=>({v:q,a:1})),...D.qs.filter(q=>!AL.includes(q)).map(q=>({v:q}))]}]);
+ const AL=APP.alerts||[];const isAL=q=>AL.some(a=>q===a||q.startsWith(a+' ('));
+ if(D.qs.length){ctx.font=F(800,36);const lim=CW-2*PAD-44,short=D.qs.filter(q=>ctx.measureText(q).width<=lim),long=D.qs.filter(q=>ctx.measureText(q).width>lim);
+  const its=[];if(short.length)its.push({t:'chips',v:[...short.filter(isAL).map(q=>({v:q,a:1})),...short.filter(q=>!isAL(q)).map(q=>({v:q}))]});long.forEach(q=>its.push({t:'bullet',v:q}));section('سبب الطلب',its)}
  const tl=[{k:'تحاليل سابقة',v:D.labs,d:D.labd},{k:'أشعة سابقة',v:D.prevHas,d:D.prevd},{k:'عمليات سابقة',v:D.surgHas,d:D.surgd}];
  if(D.preg)tl.push({k:'الحمل',v:D.preg});
  tiles(tl);
@@ -457,7 +470,7 @@ function saveImg(){const a=document.createElement('a');a.href=curURL;a.download=
 
 /* ---------- طلب جديد ---------- */
 function resetForm(){
- F.reset();QS={};qUI();EX={};EXO={};SIDE={};VW={};VWO={};urgTouched=false;modUI();renderExams();sexUI();labUI();imgUI();surgUI();conUI();autoUrg();
+ F.reset();QS={};QD={};qUI();EX={};EXO={};SIDE={};VW={};VWO={};urgTouched=false;modUI();renderExams();sexUI();labUI();imgUI();surgUI();conUI();autoUrg();
  document.querySelectorAll('.invalid').forEach(e=>e.classList.remove('invalid'));scrollTo({top:0,behavior:'smooth'})}
 $('#clr').onclick=()=>{if(confirm('مسح بيانات المريض وبدء طلب جديد؟'))resetForm()};
 $('#go').onclick=review;

@@ -3,6 +3,9 @@
    كل سطر بين علامتين '' والفاصلة , في آخره.
    ============================================================ */
 const S = n => ({ n, side: true });
+const Q = (n, ...f) => ({ n, f });
+const T = (k, req = true) => ({ k, t: 'text', req });
+const YN = (k, req = true) => ({ k, t: 'yn', req });
 const K = n => ({ n, contrast: true });   // فحص الصبغة فيه إجبارية
 const APP = {
   hospital: 'مستشفيات صحة – العقاد',   // اسم المستشفى (اختياري). لو فاضي ما يظهرش
@@ -30,21 +33,27 @@ const APP = {
     'أنف وأذن', 'أورام', 'تخدير', 'أخرى'
   ],
 
-  // أسباب الاستعجال (اختيار سريع + خانة حرة)
-  urgentReasons: [
-    'حالة حرجة / غير مستقرة', 'اشتباه جلطة / انسداد وعائي', 'نزيف',
-    'ألم شديد حاد', 'إصابة / حادث', 'اشتباه التهاب حاد / خراج',
-    'تحضير لعملية عاجلة', 'اشتباه انسداد'
-  ],
-
-  // التاريخ المرضي: الأسئلة الإكلينيكية (اختيار سريع)
+  // التاريخ المرضي (الشكوى). '---' = خط فاصل في القايمة.
+  // S('اسم')  = بيطلب تحديد الجهة (Rt / Lt / Both)
+  // Q('اسم', حقل, ...) = بيطلب كتابة تفاصيل. T('عنوان') نص إجباري / T('عنوان', false) نص اختياري / YN('عنوان') Yes-No
   questions: [
-    'استبعاد ورم', 'استبعاد التهاب / خراج',
-    'تقييم قبل عملية قادمة', 'مريض كبد', 'مريض كلى', 'اشتباه DVT', 'اشتباه زائدة دودية',
-    'التهاب بالمرارة', 'التهاب بالبنكرياس', S('مغص كلوي'), 'انسداد بالقنوات المرارية',
-    'اشتباه انسداد في الشرايين', 'اشتباه انسداد في الأمعاء', 'Trauma or RTA',
-    'Missed abortion', 'Vaginal bleeding', 'Decreased amniotic fluid', 'Irregular menstrual cycle'
+    S('DVT'), S('Limb Ischemia'), S('AV Shunt'),
+    '---',
+    'Stroke', 'Brain Hemorrhage', 'Dyspnea', 'AKI', 'CKD', 'Liver Disease or Cirrhosis', 'Cardiac patient',
+    '---',
+    'Appendicitis', S('Renal Colic'), 'Pancreatitis', 'Cholecystitis', 'Biliary Radicles Obstruction', 'Intestinal obstruction', 'RTA',
+    '---',
+    Q('Trauma', T('Site')),
+    Q('Abscess', T('Site')),
+    Q('Inflammation', T('Site')),
+    Q('Tumor', T('Site of tumor'), YN('Metastasis'), T('Previous exams', false)),
+    Q('Post operative assessment', T('Operation details')),
+    Q('Pre operative assessment', T('Operation details')),
+    '---',
+    'Vaginal bleeding', 'Abortion', 'Decreased Amniotic fluid'
   ],
+  // الحالات اللي بتظهر بلون تنبيه في الصورة
+  alerts: ['AKI', 'CKD', 'Liver Disease or Cirrhosis', 'DVT'],
 
   // الأجهزة وقوايم الفحوصات لكل جهاز.
   // S('اسم') = فحص بيطلب تحديد الجهة (يمين / يسار / الاتنين).
