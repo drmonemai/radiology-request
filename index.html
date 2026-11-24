@@ -96,7 +96,7 @@ input,select,button,textarea{font-family:inherit}
 
 <fieldset><div class="sh">👤 بيانات المريض</div><div class="bd">
  <label class="f">اسم المريض <b>*</b><input type="text" name="pname" autocomplete="off" placeholder="الاسم ثلاثي على الأقل"></label>
- <label class="f">رقم الملف<input type="text" name="mrn" inputmode="text"></label>
+ <label class="f">كود المريض أو رقم الملف<input type="text" name="mrn" inputmode="text"></label>
  <div><div class="sub">مكان المريض <b>*</b></div>
   <div class="chips" style="margin-bottom:6px"><button type="button" class="qp" data-w="طوارئ">طوارئ</button><button type="button" class="qp" data-w="رعاية مركزة">رعاية مركزة</button><button type="button" class="qp" data-w="عيادات خارجية">عيادات خارجية</button><button type="button" class="qp" data-w="غرفة ">غرفة رقم…</button></div>
   <input type="text" name="ward" placeholder="طوارئ / رعاية / رقم الغرفة (مثال: غرفة 305)" style="margin-top:0"></div>
@@ -419,7 +419,7 @@ function layout(ctx,D,draw,H){
   y+=2}
  const pn=D.patient.find(x=>x[0]==='الاسم'),pp=D.patient.find(x=>x[0]==='مكان المريض'),pa=D.patient.find(x=>x[0]==='السن'),pm=D.patient.find(x=>x[0]==='رقم الملف');
  const hero=[{t:'bigkv',k:'اسم المريض',v:pn?pn[1]:'',s:62},{t:'bigkv',k:'مكان المريض',v:pp?pp[1]:'',s:48,c:DEEP}];
- const meta=[pa&&pa[1],pm&&('ملف '+pm[1])].filter(Boolean).join('   •   ');
+ const meta=[pa&&pa[1],pm&&('كود / ملف '+pm[1])].filter(Boolean).join('   •   ');
  if(meta)hero.push({t:'bigkv',k:'السن',v:meta,s:34});
  hero.push({t:'line'},{t:'cap',v:'الفحص المطلوب'});
  D.mods.forEach(m=>{const g=gof(m.id);hero.push({t:'bsub',v:m.ar+' ('+m.en+')',g});m.items.forEach(n=>hero.push({t:'bbullet',v:n,g}));if(m.views)hero.push({t:'bigkv',k:'الأوضاع',v:m.views,s:38})});
