@@ -238,7 +238,8 @@ $('#exams').addEventListener('click',e=>{const b=e.target.closest('.xc');if(!b)r
 $('#exams').addEventListener('input',e=>{const t=e.target;if(t.classList.contains('exo'))EXO[t.dataset.m]=t.value;if(t.classList.contains('vwo')){VWO[t.dataset.m]=t.value;const bx=t.closest('.sider');bx&&bx.classList.remove('invalid')}t.classList.remove('invalid')});
 
 function applySug(name){const g=(APP.suggest||{})[name];if(!g)return;
- (g.exams||[]).forEach(([m,e])=>{if(!checked('mod').includes(m))modSet(m,true);EX[m]=EX[m]||new Set();EX[m].add(e)});
+ let ex=g.exams||[];if(g.bySide){const sd=QS[name];if(!sd)return toast('اختار الجهة الأول (Rt / Lt / Both) وبعدها طبّق الاقتراح');ex=g.bySide[sd]||[]}
+ ex.forEach(([m,e])=>{if(!checked('mod').includes(m))modSet(m,true);EX[m]=EX[m]||new Set();EX[m].add(e)});
  renderExams();
  if(g.con){const r=F.querySelector('input[name=con][value="'+g.con+'"]');if(r&&!r.disabled){r.checked=true;r.dispatchEvent(new Event('change',{bubbles:true}))}}
  crUI();

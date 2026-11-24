@@ -54,11 +54,33 @@ const APP = {
   ],
   // اقتراحات الفحوصات حسب الشكوى (الدكتور بيضغط «طبّق» وبيتختاروا لوحدهم)
   // exams: [[كود الجهاز, اسم الفحص], ...]  |  con: 'بصبغة' (اختياري)  |  ctt: 'IV only' أو 'IV + Oral' (اختياري)
+  // bySide: الفحص بيتحدد حسب الجهة اللي الدكتور اختارها (Rt / Lt / Both)
   suggest: {
-    'Renal Colic': { txt: 'CT مسالك بولية (CTUT)', exams: [['CT', 'مسالك بولية']] },
+    'DVT': { txt: 'دوبلر أوردة القدم حسب الجهة المختارة', bySide: {
+      Rt: [['DOP', 'أوردة القدم الأيمن']], Lt: [['DOP', 'أوردة القدم الأيسر']], Both: [['DOP', 'أوردة القدمين']] } },
+    'Limb Ischemia': { txt: 'دوبلر شرايين القدم حسب الجهة المختارة', bySide: {
+      Rt: [['DOP', 'شرايين القدم الأيمن']], Lt: [['DOP', 'شرايين القدم الأيسر']], Both: [['DOP', 'شرايين القدمين']] } },
+    'AV Shunt': { txt: 'دوبلر أوردة وشرايين الذراع حسب الجهة المختارة', bySide: {
+      Rt: [['DOP', 'أوردة ذراع أيمن'], ['DOP', 'شرايين ذراع أيمن']],
+      Lt: [['DOP', 'أوردة ذراع أيسر'], ['DOP', 'شرايين ذراع أيسر']],
+      Both: [['DOP', 'أوردة ذراع أيمن'], ['DOP', 'أوردة ذراع أيسر'], ['DOP', 'شرايين الذراعين']] } },
+    'Stroke': { txt: 'CT مخ بدون صبغة', exams: [['CT', 'مخ']], con: 'بدون صبغة' },
+    'Brain Hemorrhage': { txt: 'CT مخ بدون صبغة', exams: [['CT', 'مخ']], con: 'بدون صبغة' },
+    'Dyspnea': { txt: 'CT صدر', exams: [['CT', 'صدر']] },
+    'AKI': { txt: 'سونار بطن وحوض', exams: [['US', 'بطن وحوض']] },
+    'CKD': { txt: 'سونار بطن وحوض', exams: [['US', 'بطن وحوض']] },
+    'Liver Disease or Cirrhosis': { txt: 'سونار بطن وحوض', exams: [['US', 'بطن وحوض']] },
     'Appendicitis': { txt: 'CT بطن وحوض بصبغة وريدية فقط', exams: [['CT', 'بطن وحوض']], con: 'بصبغة', ctt: 'IV only' },
+    'Renal Colic': { txt: 'CT مسالك بولية (CTUT)', exams: [['CT', 'مسالك بولية']] },
+    'Pancreatitis': { txt: 'سونار بطن', exams: [['US', 'بطن']] },
+    'Cholecystitis': { txt: 'سونار بطن', exams: [['US', 'بطن']] },
+    'Biliary Radicles Obstruction': { txt: 'سونار بطن وحوض', exams: [['US', 'بطن وحوض']] },
     'Intestinal obstruction': { txt: 'أشعة بطن واقف + CT بطن وحوض بصبغة وريدية وفموية', exams: [['XR', 'بطن واقف'], ['CT', 'بطن وحوض']], con: 'بصبغة', ctt: 'IV + Oral' },
-    'Trauma': { txt: 'CT مخ + CT صدر + CT بطن وحوض بصبغة وريدية فقط', exams: [['CT', 'مخ'], ['CT', 'صدر'], ['CT', 'بطن وحوض']], con: 'بصبغة', ctt: 'IV only' }
+    'RTA': { txt: 'FAST + CT مخ + CT صدر', exams: [['US', 'FAST (طوارئ)'], ['CT', 'مخ'], ['CT', 'صدر']] },
+    'Trauma': { txt: 'CT مخ + CT صدر + CT بطن وحوض بصبغة وريدية فقط', exams: [['CT', 'مخ'], ['CT', 'صدر'], ['CT', 'بطن وحوض']], con: 'بصبغة', ctt: 'IV only' },
+    'Vaginal bleeding': { txt: 'سونار حوض', exams: [['US', 'حوض']] },
+    'Abortion': { txt: 'سونار حوض', exams: [['US', 'حوض']] },
+    'Decreased Amniotic fluid': { txt: 'سونار حمل / جنين + دوبلر حمل', exams: [['US', 'حمل / جنين'], ['DOP', 'دوبلر حمل']] }
   },
   // الحالات اللي بتظهر بلون تنبيه في الصورة
   alerts: ['AKI', 'CKD', 'Liver Disease or Cirrhosis', 'DVT'],
