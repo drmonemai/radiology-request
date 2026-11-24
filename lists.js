@@ -52,6 +52,14 @@ const APP = {
     '---',
     'Vaginal bleeding', 'Abortion', 'Decreased Amniotic fluid'
   ],
+  // اقتراحات الفحوصات حسب الشكوى (الدكتور بيضغط «طبّق» وبيتختاروا لوحدهم)
+  // exams: [[كود الجهاز, اسم الفحص], ...]  |  con: 'بصبغة' (اختياري)  |  ctt: 'IV only' أو 'IV + Oral' (اختياري)
+  suggest: {
+    'Renal Colic': { txt: 'CT مسالك بولية (CTUT)', exams: [['CT', 'مسالك بولية']] },
+    'Appendicitis': { txt: 'CT بطن وحوض بصبغة وريدية فقط', exams: [['CT', 'بطن وحوض']], con: 'بصبغة', ctt: 'IV only' },
+    'Intestinal obstruction': { txt: 'أشعة بطن واقف + CT بطن وحوض بصبغة وريدية وفموية', exams: [['XR', 'بطن واقف'], ['CT', 'بطن وحوض']], con: 'بصبغة', ctt: 'IV + Oral' },
+    'Trauma': { txt: 'CT مخ + CT صدر + CT بطن وحوض بصبغة وريدية فقط', exams: [['CT', 'مخ'], ['CT', 'صدر'], ['CT', 'بطن وحوض']], con: 'بصبغة', ctt: 'IV only' }
+  },
   // الحالات اللي بتظهر بلون تنبيه في الصورة
   alerts: ['AKI', 'CKD', 'Liver Disease or Cirrhosis', 'DVT'],
 

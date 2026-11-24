@@ -48,7 +48,7 @@ input:focus,textarea:focus,select:focus{outline:3px solid #86c5e3;outline-offset
 .hide{display:none!important}.bd2{display:grid;gap:10px}
 .exb{border:1px dashed var(--line);border-radius:12px;padding:10px;background:#fafdfe}
 .exb input.exo{margin-top:8px}
-.sider{display:grid;gap:6px;margin-top:10px;padding:6px;border-radius:10px}.sider.invalid{border:1.5px solid var(--red);background:#fff4f3}.sider>b{font-size:13px;color:var(--mut)}
+.sider{display:grid;gap:6px;width:100%;box-sizing:border-box;margin-top:10px;padding:6px;border-radius:10px}.sider.invalid{border:1.5px solid var(--red);background:#fff4f3}.sider>b{font-size:13px;color:var(--mut)}
 .pv{width:100%;display:block;border:1px solid var(--line);border-radius:12px;margin-bottom:12px}
 .qp{font:inherit;font-size:14px;border:1.5px solid var(--line);background:#fff;color:var(--ink);border-radius:999px;padding:7px 13px;cursor:pointer}.qp:active{background:var(--sec)}
 .note{font-size:12.5px;color:var(--mut)}
@@ -72,7 +72,7 @@ pre{white-space:pre-wrap;word-break:break-word;font:14.5px/1.7 system-ui,Tahoma,
 #t{position:fixed;bottom:96px;left:0;right:0;margin:auto;width:max-content;max-width:90%;background:#14282f;color:#fff;padding:10px 14px;border-radius:12px;display:none;z-index:20;text-align:center}
 .exsel{width:100%;font:inherit;font-weight:600;padding:12px;border:1.5px solid var(--line);border-radius:12px;background:#fff;color:var(--ink)}
 .chips.sel{margin-top:8px;gap:6px}
-.xc{border:1.5px solid var(--pri);background:var(--sec);color:#075a82;border-radius:999px;padding:7px 14px;font:inherit;font-weight:700}
+.sug{background:#e7f6ee;border:1.5px solid #8fd1ae;border-radius:12px;padding:10px;display:grid;gap:8px;color:#1d6b4a;font-size:14px;line-height:1.7}.sug button{background:#1d9a63;color:#fff;border:0;border-radius:10px;padding:10px;font:inherit;font-weight:700}.xc{border:1.5px solid var(--pri);background:var(--sec);color:#075a82;border-radius:999px;padding:7px 14px;font:inherit;font-weight:700}
 input,select,button,textarea{font-family:inherit}
 #gate{position:fixed;inset:0;z-index:100;background:#fff;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center}
 .gated main,.gated header,.gated .bar,.gated .time,.gated #bar2{visibility:hidden}
@@ -120,7 +120,7 @@ input,select,button,textarea{font-family:inherit}
 </div></fieldset>
 
 <fieldset><div class="sh">📝 التاريخ المرضي</div><div class="bd">
- <div><div class="sub">اختار سؤال أو أكتر، أو اكتب سؤال آخر <b>*</b></div><div class="chips sq" id="qc"></div></div>
+ <div><div class="sub">اختار سؤال أو أكتر، أو اكتب سؤال آخر <b>*</b></div><div id="qc" style="display:block"></div></div>
  <label class="f">سؤال آخر<input type="text" name="qother"></label>
  <div><div class="sub">عمليات سابقة <b>*</b></div><div class="chips" id="surgc"><label><input type="radio" name="surg" value="يوجد"><span>يوجد</span></label><label><input type="radio" name="surg" value="لا يوجد"><span>لا يوجد</span></label></div></div>
  <div class="bd2 hide" id="surgbox"><label class="f">حدد العمليات السابقة <b>*</b><input type="text" name="surgd" placeholder="النوع / التاريخ"></label></div>
@@ -137,7 +137,8 @@ input,select,button,textarea{font-family:inherit}
  <div id="conbox" class="hide"><div class="sub">الصبغة (للمقطعية)</div><div class="note hide" id="conforce" style="margin:0 0 6px;color:#075a82;font-weight:700"></div><div class="chips">
   <label><input type="radio" name="con" value="بصبغة"><span>بصبغة</span></label>
   <label><input type="radio" name="con" value="بدون صبغة"><span>بدون صبغة</span></label>
-  <label><input type="radio" name="con" value="حسب بروتوكول الأشعة"><span>حسب بروتوكول الأشعة</span></label></div></div>
+  <label><input type="radio" name="con" value="حسب بروتوكول الأشعة"><span>حسب بروتوكول الأشعة</span></label></div>
+  <div id="cttbox" class="hide" style="margin-top:8px"><div class="sub" style="margin:0">نوع الصبغة <small style="font-weight:400">اختياري</small></div><div class="chips"><label><input type="radio" name="ctt" value="IV only"><span>IV only</span></label><label><input type="radio" name="ctt" value="IV + Oral"><span>IV + Oral</span></label></div></div></div>
  <label class="f hide" id="crw">الكرياتينين (mg/dL) <b>*</b> <small style="font-weight:400">إجباري مع الصبغة</small><input type="text" name="cr" inputmode="decimal" placeholder="مثال: 1.1"></label>
  <div class="hide" id="preg"><div class="sub">الحمل (للمريضات) <small style="font-weight:400">اختياري</small></div><div class="chips">
   <label><input type="radio" name="preg" value="غير حامل"><span>غير حامل</span></label>
@@ -190,7 +191,7 @@ const QL=()=>APP.questions.filter(c=>c!=='---');
 const qn=x=>typeof x==='string'?x:x.n,qside=x=>typeof x==='object'&&!!x.side,qf=x=>(typeof x==='object'&&x.f)||[];
 let QS={},QD={};
 const QSIDES=['Rt','Lt','Both'];
-$('#qc').innerHTML='<select class="exsel" id="qsel"></select><div class="chips sel" id="qchips"></div><div id="qsides" style="display:grid;gap:8px;margin-top:8px"></div><span hidden style="display:none!important">'+QL().map(c=>chip('checkbox','q',qn(c),esc(qn(c)))).join('')+'</span>';
+$('#qc').innerHTML='<select class="exsel" id="qsel"></select><div class="chips sel" id="qchips"></div><div id="qsides" style="display:grid;gap:8px;margin-top:8px"></div><div id="qsug" style="display:grid;gap:8px;margin-top:8px"></div><span hidden style="display:none!important">'+QL().map(c=>chip('checkbox','q',qn(c),esc(qn(c)))).join('')+'</span>';
 const qTxt=c=>{const n=qn(c),d=QD[n]||{},a=[...(QS[n]?[QS[n]]:[]),...qf(c).map(f=>d[f.k]?f.k+': '+d[f.k]:'').filter(Boolean)];return a.length?n+' ('+a.join(' | ')+')':n};
 function qUI(){const on=checked('q');let h='',last='';
  APP.questions.forEach(c=>{if(c==='---'){if(h&&last!=='---')h+='<option disabled>──────────</option>';last='---';return}
@@ -198,9 +199,10 @@ function qUI(){const on=checked('q');let h='',last='';
  h=h.replace(/(<option disabled>──────────<\/option>)+$/,'');
  $('#qsel').innerHTML='<option value="">اختر الشكوى…</option>'+h;
  $('#qchips').innerHTML=QL().filter(c=>on.includes(qn(c))).map(c=>`<button type="button" class="xc" data-q="${esc(qn(c))}">${esc(qn(c))}${QS[qn(c)]?' ('+esc(QS[qn(c)])+')':''} ✕</button>`).join('');
+ $('#qsug').innerHTML=QL().filter(c=>on.includes(qn(c))&&(APP.suggest||{})[qn(c)]).map(c=>{const g=APP.suggest[qn(c)];return `<div class="sug"><div><b>💡 اقتراح (${esc(qn(c))}):</b> ${esc(g.txt)}</div><button type="button" data-sug="${esc(qn(c))}">✔ طبّق الاقتراح</button></div>`}).join('');
  $('#qsides').innerHTML=QL().filter(c=>on.includes(qn(c))&&(qside(c)||qf(c).length)).map(c=>{const n=qn(c),d=QD[n]||{};
   const side=qside(c)?`<div class="chips">${QSIDES.map(x=>`<label><input type="radio" name="qsd_${esc(n)}" data-qs="${esc(n)}" value="${x}" ${QS[n]===x?'checked':''}><span>${x}</span></label>`).join('')}</div>`:'';
-  const fs=qf(c).map(f=>f.t==='yn'?`<div style="margin-top:6px"><span class="sub" style="margin:0">${esc(f.k)}${f.req?' <span style="color:var(--red)">*</span>':''}</span><div class="chips">${['Yes','No'].map(x=>`<label><input type="radio" name="qfy_${esc(n)}_${esc(f.k)}" data-qd="${esc(n)}" data-qk="${esc(f.k)}" value="${x}" ${d[f.k]===x?'checked':''}><span>${x}</span></label>`).join('')}</div></div>`:`<label class="f" style="margin-top:6px">${esc(f.k)}${f.req?' <span style="color:var(--red)">*</span>':' (اختياري)'}<input type="text" data-qd="${esc(n)}" data-qk="${esc(f.k)}" value="${esc(d[f.k]||'')}"></label>`).join('');
+  const fs=qf(c).map(f=>f.t==='yn'?`<div style="margin-top:6px"><span class="sub" style="margin:0">${esc(f.k)}${f.req?' <span style="color:var(--red)">*</span>':''}</span><div class="chips">${['Yes','No'].map(x=>`<label><input type="radio" name="qfy_${esc(n)}_${esc(f.k)}" data-qd="${esc(n)}" data-qk="${esc(f.k)}" value="${x}" ${d[f.k]===x?'checked':''}><span>${x}</span></label>`).join('')}</div></div>`:`<label class="f" style="display:block;width:100%;margin-top:6px">${esc(f.k)}${f.req?' <span style="color:var(--red)">*</span>':' (اختياري)'}<input type="text" data-qd="${esc(n)}" data-qk="${esc(f.k)}" value="${esc(d[f.k]||'')}"></label>`).join('');
   return `<div class="sider" data-qkey="${esc(n)}"><b>${esc(n)}${qside(c)?': Rt / Lt / Both <span style="color:var(--red)">*</span>':''}</b>${side}${fs}</div>`}).join('')}
 function qSet(name,val){const cb=F.querySelector('input[name=q][value="'+name+'"]');if(!cb)return;cb.checked=val;if(!val){delete QS[name];delete QD[name]}cb.dispatchEvent(new Event('change',{bubbles:true}))}
 $('#qsel').addEventListener('change',e=>{if(e.target.value)qSet(e.target.value,true)});
@@ -235,6 +237,14 @@ $('#exams').addEventListener('change',e=>{const t=e.target;
 $('#exams').addEventListener('click',e=>{const b=e.target.closest('.xc');if(!b)return;EX[b.dataset.m].delete(b.dataset.x);delete SIDE[b.dataset.m+'|'+b.dataset.x];renderExams()});
 $('#exams').addEventListener('input',e=>{const t=e.target;if(t.classList.contains('exo'))EXO[t.dataset.m]=t.value;if(t.classList.contains('vwo')){VWO[t.dataset.m]=t.value;const bx=t.closest('.sider');bx&&bx.classList.remove('invalid')}t.classList.remove('invalid')});
 
+function applySug(name){const g=(APP.suggest||{})[name];if(!g)return;
+ (g.exams||[]).forEach(([m,e])=>{if(!checked('mod').includes(m))modSet(m,true);EX[m]=EX[m]||new Set();EX[m].add(e)});
+ renderExams();
+ if(g.con){const r=F.querySelector('input[name=con][value="'+g.con+'"]');if(r&&!r.disabled){r.checked=true;r.dispatchEvent(new Event('change',{bubbles:true}))}}
+ crUI();
+ if(g.ctt){const r=F.querySelector('input[name=ctt][value="'+g.ctt+'"]');if(r)r.checked=true}
+ $('#exams').classList.remove('invalid');$('#modc').classList.remove('invalid');toast('اتطبّق الاقتراح ✔')}
+$('#qsug').addEventListener('click',e=>{const b=e.target.closest('[data-sug]');if(b)applySug(b.dataset.sug)});
 /* ---------- الاستعجال ---------- */
 let urgTouched=false;
 const isEm=()=>APP.emergencyIsUrgent&&(v('ward')==='طوارئ'||store.spec==='طوارئ');
@@ -250,7 +260,7 @@ function imgUI(){const y=checked('pimg')[0]==='يوجد';$('#imgbox').classList.
 function conUI(){const ct=checked('mod').includes('CT');$('#conbox').classList.toggle('hide',!ct);if(!ct)F.querySelectorAll('input[name=con]').forEach(x=>x.checked=false);crUI()}
 function surgUI(){const y=checked('surg')[0]==='يوجد';$('#surgbox').classList.toggle('hide',!y);if(!y)F.elements.surgd.value=''}
 const needCr=()=>checked('mod').includes('CT')&&['بصبغة','حسب بروتوكول الأشعة'].includes(checked('con')[0]);
-function crUI(){const n=needCr();$('#crw').classList.toggle('hide',!n);if(!n)F.elements.cr.value=''}
+function crUI(){const cb=$('#cttbox');if(cb){const on=checked('mod').includes('CT')&&checked('con')[0]==='بصبغة';cb.classList.toggle('hide',!on);if(!on)F.querySelectorAll('input[name=ctt]').forEach(x=>x.checked=false)}const n=needCr();$('#crw').classList.toggle('hide',!n);if(!n)F.elements.cr.value=''}
 
 document.addEventListener('click',e=>{const q=e.target.closest&&e.target.closest('.qp');if(q){F.elements.ward.value=q.dataset.w;F.elements.ward.classList.remove('invalid');F.elements.ward.focus();autoUrg()}});
 F.addEventListener('change',e=>{const n=e.target.name;
@@ -313,6 +323,7 @@ function validate(){
  if(!checked('labs').length)bad($('#labc'),'التحاليل السابقة (يوجد / لا يوجد)');
  if(!checked('pimg').length)bad($('#imgc'),'الأشعة السابقة (يوجد / لا يوجد)');
  return miss}
+const conTxt=()=>{const c=checked('con')[0]||'',t=checked('ctt')[0];return c==='بصبغة'&&t?c+' — '+t:c};
 /* ---------- جمع البيانات ---------- */
 function collect(dt){
  const urgent=checked('urg')[0]==='عاجل';
@@ -326,9 +337,9 @@ function collect(dt){
  return{id:reqId(dt),time:fmtDT(dt),urgent,reason,
   patient:[['الاسم',v('pname')],['رقم الملف',v('mrn')],['السن',v('age')+' '+v('aunit')],['مكان المريض',v('ward')]].filter(x=>x[1]),
   doc:[['الاسم','د. '+store.doc],['التخصص',store.spec],['تليفون / داخلي',store.tel]].filter(x=>x[1]),
-  labs:checked('labs')[0],labd:checked('labs')[0]==='يوجد'?lab.join(' | '):'',surgHas:checked('surg')[0],surgd:checked('surg')[0]==='يوجد'?v('surgd'):'',prevHas:checked('pimg')[0],prevd:checked('pimg')[0]==='يوجد'?v('prev'):'',con:checked('mod').includes('CT')?(checked('con')[0]||''):'',cr:v('cr'),preg:checked('preg')[0]||'',
+  labs:checked('labs')[0],labd:checked('labs')[0]==='يوجد'?lab.join(' | '):'',surgHas:checked('surg')[0],surgd:checked('surg')[0]==='يوجد'?v('surgd'):'',prevHas:checked('pimg')[0],prevd:checked('pimg')[0]==='يوجد'?v('prev'):'',con:checked('mod').includes('CT')?conTxt():'',cr:v('cr'),preg:checked('preg')[0]||'',
   mods,qs:[...QL().filter(c=>checked('q').includes(qn(c))).map(qTxt),...(v('qother')?[v('qother')]:[])],surg:checked('surg')[0]==='يوجد'?(v('surgd')||'يوجد'):'لا يوجد',
-  safety:[['التحاليل',checked('labs')[0]==='يوجد'?(lab.join(' | ')||'يوجد'):'لا يوجد'],['الصبغة',checked('mod').includes('CT')?checked('con')[0]:''],['الحمل',checked('preg')[0]]].filter(x=>x[1]),prev:checked('pimg')[0]==='يوجد'?(v('prev')||'يوجد'):'لا يوجد'}}
+  safety:[['التحاليل',checked('labs')[0]==='يوجد'?(lab.join(' | ')||'يوجد'):'لا يوجد'],['الصبغة',checked('mod').includes('CT')?conTxt():''],['الحمل',checked('preg')[0]]].filter(x=>x[1]),prev:checked('pimg')[0]==='يوجد'?(v('prev')||'يوجد'):'لا يوجد'}}
 function textOf(D){
  const L=['🏥 *'+APP.hospital+'*','*طلب فحص أشعة*','🆔 '+D.id,'🕒 '+D.time,''];
  L.push(D.urgent?'🚨 *عاجل*'+(D.reason?' — السبب: '+D.reason:''):'⏳ غير عاجل','','*👤 المريض*');D.patient.forEach(x=>L.push(x[0]+': '+x[1]));
