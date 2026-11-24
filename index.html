@@ -72,7 +72,7 @@ pre{white-space:pre-wrap;word-break:break-word;font:14.5px/1.7 system-ui,Tahoma,
 #t{position:fixed;bottom:96px;left:0;right:0;margin:auto;width:max-content;max-width:90%;background:#14282f;color:#fff;padding:10px 14px;border-radius:12px;display:none;z-index:20;text-align:center}
 .exsel{width:100%;font:inherit;font-weight:600;padding:12px;border:1.5px solid var(--line);border-radius:12px;background:#fff;color:var(--ink)}
 .chips.sel{margin-top:8px;gap:6px}
-.sug{background:#e7f6ee;border:1.5px solid #8fd1ae;border-radius:12px;padding:10px;display:grid;gap:8px;color:#1d6b4a;font-size:14px;line-height:1.7}.sug button{background:#1d9a63;color:#fff;border:0;border-radius:10px;padding:10px;font:inherit;font-weight:700}.xc{border:1.5px solid var(--pri);background:var(--sec);color:#075a82;border-radius:999px;padding:7px 14px;font:inherit;font-weight:700}
+.sug{background:#e7f6ee;border:1.5px solid #8fd1ae;border-radius:12px;padding:10px;display:grid;gap:8px;color:#1d6b4a;font-size:14px;line-height:1.7}.sug ul{margin:0;padding:0 18px 0 0;list-style:disc;font-weight:700}.sug button{background:#1d9a63;color:#fff;border:0;border-radius:10px;padding:10px;font:inherit;font-weight:700}.xc{border:1.5px solid var(--pri);background:var(--sec);color:#075a82;border-radius:999px;padding:7px 14px;font:inherit;font-weight:700}
 input,select,button,textarea{font-family:inherit}
 #gate{position:fixed;inset:0;z-index:100;background:#fff;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center}
 .gated main,.gated header,.gated .bar,.gated .time,.gated #bar2{visibility:hidden}
@@ -199,7 +199,9 @@ function qUI(){const on=checked('q');let h='',last='';
  h=h.replace(/(<option disabled>──────────<\/option>)+$/,'');
  $('#qsel').innerHTML='<option value="">اختر الشكوى…</option>'+h;
  $('#qchips').innerHTML=QL().filter(c=>on.includes(qn(c))).map(c=>`<button type="button" class="xc" data-q="${esc(qn(c))}">${esc(qn(c))}${QS[qn(c)]?' ('+esc(QS[qn(c)])+')':''} ✕</button>`).join('');
- $('#qsug').innerHTML=QL().filter(c=>on.includes(qn(c))&&(APP.suggest||{})[qn(c)]).map(c=>{const g=APP.suggest[qn(c)];return `<div class="sug"><div><b>💡 اقتراح (${esc(qn(c))}):</b> ${esc(g.txt)}</div><button type="button" data-sug="${esc(qn(c))}">✔ طبّق الاقتراح</button></div>`}).join('');
+ $('#qsug').innerHTML=QL().filter(c=>on.includes(qn(c))&&(APP.suggest||{})[qn(c)]).map(c=>{const g=APP.suggest[qn(c)];
+  const lines=g.bySide?[g.txt]:[...(g.exams||[]).map(([m,e])=>MOD[m].ar+': '+e),...(g.con?['الصبغة: '+g.con+(g.ctt?' ('+g.ctt+')':'')]:[])];
+  return `<div class="sug"><div><b>💡 اقتراح فحوصات لـ <bdi>${esc(qn(c))}</bdi></b></div><ul>${lines.map(l=>`<li><bdi>${esc(l)}</bdi></li>`).join('')}</ul><button type="button" data-sug="${esc(qn(c))}">✔ طبّق الاقتراح</button></div>`}).join('');
  $('#qsides').innerHTML=QL().filter(c=>on.includes(qn(c))&&(qside(c)||qf(c).length)).map(c=>{const n=qn(c),d=QD[n]||{};
   const side=qside(c)?`<div class="chips">${QSIDES.map(x=>`<label><input type="radio" name="qsd_${esc(n)}" data-qs="${esc(n)}" value="${x}" ${QS[n]===x?'checked':''}><span>${x}</span></label>`).join('')}</div>`:'';
   const fs=qf(c).map(f=>f.t==='yn'?`<div style="margin-top:6px"><span class="sub" style="margin:0">${esc(f.k)}${f.req?' <span style="color:var(--red)">*</span>':''}</span><div class="chips">${['Yes','No'].map(x=>`<label><input type="radio" name="qfy_${esc(n)}_${esc(f.k)}" data-qd="${esc(n)}" data-qk="${esc(f.k)}" value="${x}" ${d[f.k]===x?'checked':''}><span>${x}</span></label>`).join('')}</div></div>`:`<label class="f" style="display:block;width:100%;margin-top:6px">${esc(f.k)}${f.req?' <span style="color:var(--red)">*</span>':' (اختياري)'}<input type="text" data-qd="${esc(n)}" data-qk="${esc(f.k)}" value="${esc(d[f.k]||'')}"></label>`).join('');
