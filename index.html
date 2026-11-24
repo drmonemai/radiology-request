@@ -332,15 +332,19 @@ let logoImg=null;
 const logoReady=new Promise(r=>{const i=new Image();i.onload=()=>{logoImg=i;r()};i.onerror=()=>r();if(APP.logo)i.src=APP.logo;else r()});
 function layout(ctx,D,draw,H){
  const W=1080,M=44,R=W-M,CW=W-2*M,PAD=28;
- const INK='#10242b',MUT='#526973',PRI='#0b7fb8',TEAL='#2bb3a6',LINE='#cfe0e8',SEC='#e3f1f7',DEEP='#075a82',TD='#0a8077';
+ const TH={xct:{PRI:'#0b7fb8',TEAL:'#2bb3a6',DEEP:'#075a82',SEC:'#e3f1f7',LINE:'#cfe0e8',BG:'#eef5f8',TD:'#0a8077'},us:{PRI:'#6d3fb8',TEAL:'#a56ee0',DEEP:'#4a2a85',SEC:'#efe7fa',LINE:'#d9cdee',BG:'#f4f0fa',TD:'#5b34a0'}};
+ const gof=id=>APP.route[id]==='us'?'us':'xct',gks=[...new Set(D.mods.map(m=>gof(m.id)))],MIX=gks.length>1,T0=TH[MIX?'xct':gks[0]||'xct'];
+ const INK='#10242b',MUT='#526973',{PRI,TEAL,LINE,SEC,DEEP,TD,BG}=T0;
  const F=(w,s)=>w+' '+s+'px "IBM Plex Sans Arabic","Segoe UI",Tahoma,Arial,sans-serif';
  ctx.direction='rtl';ctx.textBaseline='alphabetic';
- const grad=(x0,x1)=>{const g=ctx.createLinearGradient(x0,0,x1,0);g.addColorStop(0,PRI);g.addColorStop(1,TEAL);return g};
+ const grad=(x0,x1,gk)=>{const g=ctx.createLinearGradient(x0,0,x1,0);
+  if(MIX&&!gk){g.addColorStop(0,TH.us.PRI);g.addColorStop(0.5,TH.us.TEAL);g.addColorStop(0.5,TH.xct.PRI);g.addColorStop(1,TH.xct.TEAL)}
+  else{const t=gk?TH[gk]:T0;g.addColorStop(0,t.PRI);g.addColorStop(1,t.TEAL)}return g};
  const rr=(x,y,w,h,r)=>{ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()};
  const wrap=(t,maxW,font)=>{ctx.font=font;const out=[];String(t).split('\n').forEach(par=>{const words=par.split(/\s+/).filter(Boolean);let line='';words.forEach(w=>{const test=line?line+' '+w:w;if(ctx.measureText(test).width>maxW&&line){out.push(line);line=w}else line=test});out.push(line)});return out};
  const HH=APP.logo?142:(APP.hospital?104:76);
  let y=0;
- if(draw){ctx.fillStyle='#eef5f8';ctx.fillRect(0,0,W,H);ctx.fillStyle='#fff';ctx.fillRect(0,0,W,HH)}
+ if(draw){ctx.fillStyle=BG;ctx.fillRect(0,0,W,H);ctx.fillStyle='#fff';ctx.fillRect(0,0,W,HH)}
  if(draw&&logoImg){const lh=84,lw=lh*logoImg.width/logoImg.height;ctx.drawImage(logoImg,(W-lw)/2,8,lw,lh)}
  if(draw){ctx.textAlign='center';ctx.fillStyle=DEEP;
   if(APP.logo){ctx.font=F(700,26);ctx.fillText(APP.dept||'',W/2,126)}
@@ -362,15 +366,15 @@ function layout(ctx,D,draw,H){
     yy+=28+L1+(lines.length-1)*LH+16}
    else if(it.t==='line'){if(doDraw){ctx.fillStyle=LINE;ctx.fillRect(M+PAD,yy+4,CW-2*PAD,2)}yy+=18}
    else if(it.t==='cap'){if(doDraw){ctx.textAlign='right';ctx.fillStyle=MUT;ctx.font=F(700,27);ctx.fillText(it.v,R-PAD,yy+28)}yy+=42}
-   else if(it.t==='bsub'){if(doDraw){ctx.font=F(800,36);const w=ctx.measureText(it.v).width+44;ctx.fillStyle=grad(R-PAD-w,R-PAD);rr(R-PAD-w,yy+2,w,60,30);ctx.fill();ctx.fillStyle='#fff';ctx.textAlign='center';ctx.fillText(it.v,R-PAD-w/2,yy+44)}yy+=76}
+   else if(it.t==='bsub'){if(doDraw){ctx.font=F(800,36);const w=ctx.measureText(it.v).width+44;ctx.fillStyle=grad(R-PAD-w,R-PAD,it.g);rr(R-PAD-w,yy+2,w,60,30);ctx.fill();ctx.fillStyle='#fff';ctx.textAlign='center';ctx.fillText(it.v,R-PAD-w/2,yy+44)}yy+=76}
    else if(it.t==='bbullet'){const lines=wrap(it.v,CW-2*PAD-48,F(800,48));
-    if(doDraw){ctx.fillStyle=TEAL;ctx.beginPath();ctx.arc(R-PAD-10,yy+30,10,0,7);ctx.fill();ctx.textAlign='right';ctx.fillStyle=INK;ctx.font=F(800,48);lines.forEach((l,i)=>ctx.fillText(l,R-PAD-44,yy+42+i*58))}
+    if(doDraw){ctx.fillStyle=it.g?TH[it.g].TEAL:TEAL;ctx.beginPath();ctx.arc(R-PAD-10,yy+30,10,0,7);ctx.fill();ctx.textAlign='right';ctx.fillStyle=INK;ctx.font=F(800,48);lines.forEach((l,i)=>ctx.fillText(l,R-PAD-44,yy+42+i*58))}
     yy+=lines.length*58+4}
    else if(it.t==='con'){const f=F(800,42);ctx.font=f;const tw=ctx.measureText(it.v).width+48;
     if(doDraw){ctx.fillStyle=TD;rr(R-PAD-tw,yy+4,tw,64,16);ctx.fill();ctx.fillStyle='#fff';ctx.font=f;ctx.textAlign='center';ctx.fillText(it.v,R-PAD-tw/2,yy+50)}
     yy+=84}
    else if(it.t==='bullet'){const lines=wrap(it.v,CW-2*PAD-44,F(800,40));
-    if(doDraw){ctx.fillStyle=TEAL;ctx.beginPath();ctx.arc(R-PAD-8,yy+22,8,0,7);ctx.fill();ctx.textAlign='right';ctx.fillStyle=INK;ctx.font=F(800,40);lines.forEach((l,i)=>ctx.fillText(l,R-PAD-34,yy+34+i*50))}
+    if(doDraw){ctx.fillStyle=it.g?TH[it.g].TEAL:TEAL;ctx.beginPath();ctx.arc(R-PAD-8,yy+22,8,0,7);ctx.fill();ctx.textAlign='right';ctx.fillStyle=INK;ctx.font=F(800,40);lines.forEach((l,i)=>ctx.fillText(l,R-PAD-34,yy+34+i*50))}
     yy+=lines.length*50+8}
    else if(it.t==='alert'){const f=F(800,40);ctx.font=f;const tw=ctx.measureText(it.v).width+56;
     if(doDraw){ctx.fillStyle='#fff1c9';rr(R-PAD-tw,yy+2,tw,64,14);ctx.fill();ctx.strokeStyle='#d9a21b';ctx.lineWidth=3;ctx.stroke();ctx.fillStyle='#6b4a00';ctx.font=f;ctx.textAlign='center';ctx.fillText(it.v,R-PAD-tw/2,yy+48)}
@@ -386,7 +390,7 @@ function layout(ctx,D,draw,H){
   });return yy-top}
  function section(title,list,hero){if(!list.length)return;
   const bh=items(list,0,false)+PAD-14,h=60+bh;
-  if(draw){ctx.fillStyle='#fff';rr(M,y,CW,h,20);ctx.fill();ctx.strokeStyle=hero?PRI:LINE;ctx.lineWidth=hero?5:2;ctx.stroke();
+  if(draw){ctx.fillStyle='#fff';rr(M,y,CW,h,20);ctx.fill();ctx.strokeStyle=hero?grad(M,R):LINE;ctx.lineWidth=hero?5:2;ctx.stroke();
    ctx.save();rr(M,y,CW,h,20);ctx.clip();ctx.fillStyle=hero?grad(M,R):SEC;ctx.fillRect(M,y,CW,60);ctx.restore();
    ctx.fillStyle=hero?'#fff':DEEP;ctx.font=F(800,31);ctx.textAlign='right';ctx.fillText(title,R-PAD,y+41);items(list,y+60+14,true)}
   y+=h+14}
@@ -406,7 +410,7 @@ function layout(ctx,D,draw,H){
  const meta=[pa&&pa[1],pm&&('ملف '+pm[1])].filter(Boolean).join('   •   ');
  if(meta)hero.push({t:'bigkv',k:'السن',v:meta,s:34});
  hero.push({t:'line'},{t:'cap',v:'الفحص المطلوب'});
- D.mods.forEach(m=>{hero.push({t:'bsub',v:m.ar+' ('+m.en+')'});m.items.forEach(n=>hero.push({t:'bbullet',v:n}));if(m.views)hero.push({t:'bigkv',k:'الأوضاع',v:m.views,s:38})});
+ D.mods.forEach(m=>{const g=gof(m.id);hero.push({t:'bsub',v:m.ar+' ('+m.en+')',g});m.items.forEach(n=>hero.push({t:'bbullet',v:n,g}));if(m.views)hero.push({t:'bigkv',k:'الأوضاع',v:m.views,s:38})});
  if(D.con)hero.push({t:'con',v:'الصبغة: '+D.con+(D.cr?' — كرياتينين '+D.cr:'')});
  section('المريض والفحص المطلوب',hero,true);
  const AL=['مريض كبد','مريض كلى','اشتباه DVT'];
