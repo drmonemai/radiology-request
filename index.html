@@ -385,6 +385,7 @@ function layout(ctx,D,draw,H){
    ctx.font=F(700,34);ctx.textAlign='right';lines.forEach((l,i)=>ctx.fillText(l,R-PAD,y+104+i*44))}
   y+=h+14}
  else{const h=60;if(draw){ctx.fillStyle=SEC;rr(M,y,CW,h,22);ctx.fill();ctx.fillStyle=DEEP;ctx.textAlign='center';ctx.font=F(800,34);ctx.fillText('غير عاجل',W/2,y+42)}y+=h+14}
+ if(D.mods.some(m=>m.id==='XRO')){const h=78;if(draw){ctx.fillStyle='#d9650a';rr(M,y,CW,h,22);ctx.fill();ctx.fillStyle='#fff';ctx.textAlign='center';ctx.font=F(800,48);ctx.fillText('أشعة عادية متنقل',W/2,y+56)}y+=h+14}
  function items(list,top,doDraw){let yy=top;
   list.forEach(it=>{
    if(it.t==='bigkv'){const lines=wrap(it.v,CW-2*PAD,F(800,it.s)),L1=Math.round(it.s*1.2),LH=Math.round(it.s*1.3);
