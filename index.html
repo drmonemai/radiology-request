@@ -74,7 +74,8 @@ pre{white-space:pre-wrap;word-break:break-word;font:14.5px/1.7 system-ui,Tahoma,
 .chips.sel{margin-top:8px;gap:6px}
 .sug{background:#e7f6ee;border:1.5px solid #8fd1ae;border-radius:12px;padding:10px;display:grid;gap:8px;color:#1d6b4a;font-size:14px;line-height:1.7}.sug ul{margin:0;padding:0 18px 0 0;list-style:disc;font-weight:700}.sug button{background:#1d9a63;color:#fff;border:0;border-radius:10px;padding:10px;font:inherit;font-weight:700}.xc{border:1.5px solid var(--pri);background:var(--sec);color:#075a82;border-radius:999px;padding:7px 14px;font:inherit;font-weight:700}
 input,select,button,textarea{font-family:inherit}
-#gate{position:fixed;inset:0;z-index:100;background:#fff;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center}
+ol.stp{margin:6px 0;padding-inline-start:20px;line-height:1.9}
+#blk{position:fixed;inset:0;z-index:200;background:#eef5f8;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center}#blk .bb{max-width:340px;background:#fff;border:2px solid #f3b9b4;border-radius:18px;padding:26px 18px;display:grid;gap:12px}#blk h2{margin:0;color:#c9372c;font-size:22px}#blk p{margin:0;color:#5a717a;line-height:1.9}#gate{position:fixed;inset:0;z-index:100;background:#fff;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center}
 .gated main,.gated header,.gated .bar,.gated .time,.gated #bar2{visibility:hidden}
 #gate .gb{max-width:340px}
 #gate img{border-radius:20px;margin-bottom:10px}
@@ -286,14 +287,38 @@ function docSetup(first){
  <label class="f">الاسم <b>*</b><input type="text" id="sn" value="${esc(store.doc||'')}"></label>
  <label class="f">التخصص <b>*</b><select id="ss"><option value="">اختار التخصص</option>${sp.map(s=>`<option ${s===cur?'selected':''}>${esc(s)}</option>`).join('')}</select></label>
  <label class="f ${cur==='أخرى'?'':'hide'}" id="sol">اكتب التخصص<input type="text" id="so" value="${cur==='أخرى'?esc(store.spec):''}"></label>
- <label class="f">تليفون / داخلي (اختياري)<input type="tel" id="st" value="${esc(store.tel||'')}"></label>
+ <label class="f">رقم الموبايل <b>*</b><input type="tel" id="st" inputmode="tel" placeholder="01xxxxxxxxx" value="${esc(store.tel||'')}"></label>
  <div class="row"><button class="b pri" id="sv" type="button">حفظ</button>${first?'':'<button class="b sec2" id="cx" type="button">إلغاء</button>'}</div></div>`);
  $('#m').dataset.lock=first?'1':'';
  $('#ss').onchange=()=>$('#sol').classList.toggle('hide',$('#ss').value!=='أخرى');
  if(!first)$('#cx').onclick=closeM;
  $('#sv').onclick=()=>{const n=$('#sn').value.trim();let s=$('#ss').value;if(s==='أخرى')s=$('#so').value.trim();
   if(!n||!s)return toast('اكتب الاسم واختار التخصص');
-  store.doc=n;store.spec=s;store.tel=$('#st').value.trim();persist();$('#m').dataset.lock='';closeM();renderDoc();urgTouched=false;autoUrg();toast('اتحفظت بياناتك ✔')}}
+  const tl=$('#st').value.replace(/[\s\-]/g,'').replace(/[٠-٩]/g,c=>'٠١٢٣٤٥٦٧٨٩'.indexOf(c));
+  if(!/^\+?\d{10,15}$/.test(tl))return toast('اكتب رقم موبايلك صح (11 رقم)');
+  store.doc=n;store.spec=s;store.tel=tl;persist();$('#m').dataset.lock='';closeM();renderDoc();urgTouched=false;autoUrg();toast('اتحفظت بياناتك ✔');regCheck()}}
+
+/* ---------- سجل الأطباء والإحصائيات (Google Sheet) ---------- */
+const REG=APP.registry||'';
+const devId=(()=>{try{let d=localStorage.getItem('rr2_dev');if(!d){d=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():'d'+Date.now()+Math.random().toString(36).slice(2);localStorage.setItem('rr2_dev',d)}return d}catch(e){return 'x'+Math.random().toString(36).slice(2)}})();
+function blockUI(on){let b=document.getElementById('blk');
+ if(!on){if(b)b.remove();return}
+ if(b)return;b=document.createElement('div');b.id='blk';
+ b.innerHTML='<div class="bb"><div style="font-size:52px">⛔</div><h2>تم إيقاف حسابك</h2><p>لو شايف ده بالغلط، كلّم '+esc(APP.adminContact||'مسؤول البرنامج')+'.</p></div>';
+ document.body.appendChild(b)}
+// تسجيل / فحص الحالة. لو الشيت مش متاح: بنكمّل عادي (مفيش حظر إلا لو الرد صريح «موقوف»)
+function regCheck(){if(!REG||!store.doc)return Promise.resolve();
+ const q=new URLSearchParams({a:'reg',id:devId,name:store.doc||'',spec:store.spec||'',tel:store.tel||''});
+ const c=new AbortController(),t=setTimeout(()=>c.abort(),8000);
+ return fetch(REG+'?'+q,{signal:c.signal}).then(r=>r.json()).then(j=>{clearTimeout(t);if(j&&j.ok)blockUI(j.status==='موقوف')}).catch(()=>clearTimeout(t))}
+function logRequest(D){if(!REG||!D)return;
+ try{const pv=k=>(D.patient.find(x=>x[0]===k)||[,''])[1],dv=k=>(D.doc.find(x=>x[0]===k)||[,''])[1];
+  const body={a:'log',id:devId,reqId:D.id,time:new Date().toISOString(),urgent:D.urgent,reason:D.reason||'',
+   patient:{name:pv('الاسم'),code:pv('رقم الملف'),age:pv('السن'),ward:pv('مكان المريض')},doc:{name:store.doc||'',spec:store.spec||''},
+   qs:D.qs,con:D.con||'',mods:D.mods.map(m=>({ar:m.ar,items:m.items}))};
+  fetch(REG,{method:'POST',mode:'no-cors',body:JSON.stringify(body),keepalive:true}).catch(()=>{})}catch(e){}}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)regCheck()});
+regCheck();
 $('#de').onclick=()=>docSetup(false);
 
 
@@ -339,7 +364,7 @@ function collect(dt){
  const lab=[];if(v('tlc'))lab.push('TLC '+v('tlc'));if(v('labo'))lab.push(v('labo'));
  return{id:reqId(dt),time:fmtDT(dt),urgent,reason,
   patient:[['الاسم',v('pname')],['رقم الملف',v('mrn')],['السن',v('age')+' '+v('aunit')],['مكان المريض',v('ward')]].filter(x=>x[1]),
-  doc:[['الاسم','د. '+store.doc],['التخصص',store.spec],['تليفون / داخلي',store.tel]].filter(x=>x[1]),
+  doc:[['الاسم','د. '+store.doc],['التخصص',store.spec]].filter(x=>x[1]),
   labs:checked('labs')[0],labd:checked('labs')[0]==='يوجد'?lab.join(' | '):'',surgHas:checked('surg')[0],surgd:checked('surg')[0]==='يوجد'?v('surgd'):'',prevHas:checked('pimg')[0],prevd:checked('pimg')[0]==='يوجد'?v('prev'):'',con:checked('mod').includes('CT')?conTxt():'',cr:v('cr'),preg:checked('preg')[0]||'',
   mods,qs:[...QL().filter(c=>checked('q').includes(qn(c))).map(qTxt),...(v('qother')?[v('qother')]:[])],surg:checked('surg')[0]==='يوجد'?(v('surgd')||'يوجد'):'لا يوجد',
   safety:[['التحاليل',checked('labs')[0]==='يوجد'?(lab.join(' | ')||'يوجد'):'لا يوجد'],['الصبغة',checked('mod').includes('CT')?conTxt():''],['الحمل',checked('preg')[0]]].filter(x=>x[1]),prev:checked('pimg')[0]==='يوجد'?(v('prev')||'يوجد'):'لا يوجد'}}
@@ -471,16 +496,19 @@ async function review(){
  try{curBlob=await makeImage(curD)}catch(e){return toast('حصلت مشكلة في عمل الصورة')}
  if(curURL)URL.revokeObjectURL(curURL);curURL=URL.createObjectURL(curBlob);
  const gk=[...new Set(curD.mods.map(m=>APP.route[m.id]).filter(Boolean))];
- const names=gk.map(k=>APP.groups[k].name);
+ const names=gk.map(k=>APP.groups[k].name);GN=names;GS=0;
  modal(`<h2>راجع الطلب قبل الإرسال</h2><img class="pv" src="${curURL}" alt="صورة الطلب">
- <div class="warn" style="margin-bottom:10px">بعد الضغط على «مشاركة» اختار <b>واتساب</b> ثم: <b>${names.map(esc).join(' + ')}</b>${names.length>1?'<br>الطلب فيه جهازين من جروبين: ابعته لأول جروب، وبعدين اضغط «مشاركة» تاني للجروب التاني.':''}</div>
+ <div class="warn" style="margin-bottom:10px">${names.length>1?`<b>الطلب فيه فحوصات لجروبين، لازم يتبعت للاتنين:</b><ol class="stp">${names.map((n,i)=>`<li id="gs${i}">اضغط «مشاركة» ← واتساب ← <b>${esc(n)}</b> ← إرسال</li>`).join('')}</ol>بعد الأول ارجع هنا واضغط «مشاركة» تاني للجروب اللي بعده. نفس الصورة بتتبعت للاتنين.`:`بعد الضغط على «مشاركة» اختار <b>واتساب</b> ثم: <b>${names.map(esc).join(' + ')}</b>`}</div>
  <div class="row" style="flex-direction:column"><button class="b send" id="sh" type="button">📤 مشاركة على جروب الواتساب</button><button class="b sec2" id="bk" type="button">✏️ تعديل</button></div>`);
  $('#sh').onclick=shareImg;$('#bk').onclick=closeM}
 function fileOf(){return new File([curBlob],curD.id+'.png',{type:'image/png'})}
 async function shareImg(){
  const f=fileOf(),pv=k=>(curD.patient.find(x=>x[0]===k)||[,''])[1],ex=curD.mods.map(m=>m.ar+': '+m.items.join('، ')).join(' | '),cap=[(curD.urgent?'🚨 عاجل':''),pv('الاسم'),pv('مكان المريض'),ex].filter(Boolean).join(' — ');
- try{if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],text:cap});return}}catch(e){if(e&&e.name==='AbortError')return}
- saveImg();toast('المشاركة مش متاحة هنا. اتحفظت الصورة، ابعتها من المعرض')}
+ try{if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],text:cap});logRequest(curD);markShared();return}}catch(e){if(e&&e.name==='AbortError')return}
+ logRequest(curD);saveImg();toast('المشاركة مش متاحة هنا. اتحفظت الصورة، ابعتها من المعرض')}
+let GN=[],GS=0;
+function markShared(){GS++;if(GN.length<2)return;const li=document.getElementById('gs'+(GS-1));if(li){li.style.textDecoration='line-through';li.style.opacity='.6';li.insertAdjacentText('afterbegin','✔ ')}
+ const b=document.getElementById('sh');if(b)b.textContent=GS<GN.length?'📤 مشاركة تاني: '+GN[GS]:'✔ اتبعت للجروبين (مشاركة تاني لو محتاج)'}
 function saveImg(){const a=document.createElement('a');a.href=curURL;a.download=curD.id+'.png';document.body.appendChild(a);a.click();a.remove()}
 
 /* ---------- طلب جديد ---------- */
@@ -490,7 +518,7 @@ function resetForm(){
 $('#clr').onclick=()=>{if(confirm('مسح بيانات المريض وبدء طلب جديد؟'))resetForm()};
 $('#go').onclick=review;
 
-if(store.doc&&store.spec){renderDoc()}else{$('#dn').textContent='—';docSetup(true)}
+if(store.doc&&store.spec&&store.tel){renderDoc()}else if(store.doc&&store.spec){renderDoc();docSetup(true)}else{$('#dn').textContent='—';docSetup(true)}
 resetForm();window.scrollTo(0,0);
 /* ---------- التثبيت إجباري في أول مرة (على الموبايل) ---------- */
 (function(){let dp=null;
