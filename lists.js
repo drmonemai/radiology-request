@@ -12,7 +12,7 @@ const APP = {
   logo: 'icons/logo.png',       // مسار اللوجو (اختياري). لو فاضي ما يظهرش
   owner: 'Designed by Dr. Abdelmonem Yahia',
   // رابط سجل الأطباء والإحصائيات (Google Apps Script Web app). لو فاضي: الخاصية مقفولة والبرنامج شغال عادي
-  registry: '',
+  registry: 'https://script.google.com/macros/s/AKfycbz75BiLAdQacmhlOSU7EsCHlnXL-AgAEhKXjp8LP0uj27VAEe4Vb9lCkXgXMdeDhr7D/exec',
   adminContact: 'د. عبدالمنعم يحيى',   // بيظهر في شاشة الحساب الموقوف   // اسم صاحب البرنامج (اختياري)
   // الحالات الغير عاجلة (داخلي / رعاية) بتتبعت في الوقت ده بس. العاجل والطوارئ والعيادات في أي وقت
   window: { from: 10, to: 18 },
