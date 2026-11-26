@@ -307,7 +307,7 @@ function blockUI(on){let b=document.getElementById('blk');
  b.innerHTML='<div class="bb"><div style="font-size:52px">⛔</div><h2>تم إيقاف حسابك</h2><p>لو شايف ده بالغلط، كلّم '+esc(APP.adminContact||'مسؤول البرنامج')+'.</p></div>';
  document.body.appendChild(b)}
 // تسجيل / فحص الحالة. لو الشيت مش متاح: بنكمّل عادي (مفيش حظر إلا لو الرد صريح «موقوف»)
-function regCheck(){if(!REG||!store.doc)return Promise.resolve();
+function regCheck(){if(!REG||!store.doc||!store.tel)return Promise.resolve();
  const q=new URLSearchParams({a:'reg',id:devId,name:store.doc||'',spec:store.spec||'',tel:store.tel||''});
  const c=new AbortController(),t=setTimeout(()=>c.abort(),8000);
  return fetch(REG+'?'+q,{signal:c.signal}).then(r=>r.json()).then(j=>{clearTimeout(t);if(j&&j.ok)blockUI(j.status==='موقوف')}).catch(()=>clearTimeout(t))}
